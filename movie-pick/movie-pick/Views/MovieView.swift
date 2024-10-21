@@ -34,6 +34,9 @@ struct MovieView: View {
                     
                     ComingSoonSection()
                     
+                    Spacer().frame(height: 16)
+                    
+                    WatchlistSection()
                     
                     Spacer().frame(height: 50)
                     
