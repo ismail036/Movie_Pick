@@ -43,7 +43,6 @@ struct TrendingSection: View {
                                .foregroundColor(selectedTab == "This Week" ? .white : .gray)
                        }
                    }
-                   .padding(.horizontal)
             
                 
             
