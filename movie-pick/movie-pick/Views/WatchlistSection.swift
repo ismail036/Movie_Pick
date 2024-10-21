@@ -12,7 +12,7 @@ struct WatchlistSection: View {
         VStack() {
             HStack {
                 Text("Watchlist")
-                    .font(.largeTitle)
+                    .font(.title)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                 

@@ -42,6 +42,10 @@ struct MovieView: View {
                     
                     BoxOfficeView()
                     
+                    Spacer().frame(height: 16)
+                    
+                    PeopleSection()
+                    
                     Spacer().frame(height: 50)
                     
 

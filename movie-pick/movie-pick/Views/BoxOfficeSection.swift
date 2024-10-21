@@ -20,7 +20,7 @@ struct BoxOfficeView: View {
         VStack(alignment: .leading) {
             HStack{
                 Text("World Box Office")
-                    .font(.title2) // Reduced font size
+                    .font(.title) // Reduced font size
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                 
