@@ -63,7 +63,7 @@ struct WatchlistSection: View {
             }) {
                 Image(systemName: "plus")
                     .resizable()
-                    .frame(width: 16, height: 16)
+                    .frame(width: 12, height: 12)
                     .foregroundColor(.white)
                     .padding()
                     .background(Circle().fill(Color.blue))
