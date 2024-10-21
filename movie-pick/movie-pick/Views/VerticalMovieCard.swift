@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TrendingMovieCardView: View {
+struct VerticalMovieCard: View {
     var movieTitle: String
     var moviePoster: String
     var rating: Int
@@ -21,7 +21,7 @@ struct TrendingMovieCardView: View {
                 Text(movieTitle)
                     .font(.system(size: 14))
                     .foregroundColor(.white)
-                    .lineLimit(1)
+                    .lineLimit(2)
                     .padding(.leading, 8)
                 
                 Rectangle()
@@ -51,7 +51,7 @@ struct TrendingMovieCardView: View {
                     .fill(Color.clear)
                     .frame(height: 1)
             }
-            .frame(width: 165, height: 220)
+            .frame(width: 165, height: 210)
             .background(Color.mainColor3)
             .cornerRadius(12)
             .offset(y: 40)
@@ -62,16 +62,16 @@ struct TrendingMovieCardView: View {
                 .scaledToFit()
                 .frame(height: 220)
                 .cornerRadius(12)
-                .offset(y: -35)
+                .offset(y: -45)
         }
-        .frame(width: 170, height: 300)
+        .frame(width: 170, height: 310)
         .cornerRadius(12)
         .shadow(radius: 5)
     }
 }
 
 #Preview {
-    TrendingMovieCardView(
+    VerticalMovieCard(
         movieTitle: "Deadpool & Wolverine",
         moviePoster: "deadpool_wolverine",
         rating: 4,

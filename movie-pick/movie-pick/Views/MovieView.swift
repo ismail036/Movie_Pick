@@ -30,6 +30,10 @@ struct MovieView: View {
                 
                     DiscoverSection()
                     
+                    Spacer().frame(height: 32)
+                    
+                    ComingSoonSection()
+                    
                     
                     Spacer().frame(height: 50)
                     
@@ -43,7 +47,10 @@ struct MovieView: View {
                 .padding(.horizontal,16)
                 .padding(.vertical,16)
             }
-            }
+        }
+        .background(
+            Color.mainColor1
+        )
         
         
 

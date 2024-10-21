@@ -50,28 +50,28 @@ struct TrendingSection: View {
             ScrollView(.horizontal) {
                 HStack {
                     
-                    TrendingMovieCardView(
+                    VerticalMovieCard(
                         movieTitle: "Deadpool & Wolverine",
                         moviePoster: "deadpool_wolverine",
                         rating: 5,
                         releaseYear: "2024"
                     )
                     
-                    TrendingMovieCardView(
+                    VerticalMovieCard(
                         movieTitle: "Bad Boys: Ride or Die",
                         moviePoster: "bad_boys",
                         rating: 4,
                         releaseYear: "2024"
                     )
                     
-                    TrendingMovieCardView(
+                    VerticalMovieCard(
                         movieTitle: "Despicable Me 4",
                         moviePoster: "despicable",
                         rating: 3,
                         releaseYear: "2024"
                     )
                     
-                    TrendingMovieCardView(
+                    VerticalMovieCard(
                         movieTitle: "Deadpool & Wolverine",
                         moviePoster: "deadpool_wolverine",
                         rating: 5,
