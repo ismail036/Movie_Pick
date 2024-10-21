@@ -51,10 +51,10 @@ struct TrendingMovieCardView: View {
                     .fill(Color.clear)
                     .frame(height: 1)
             }
-            .frame(width: 165, height: 200)
+            .frame(width: 165, height: 220)
             .background(Color.mainColor3)
             .cornerRadius(12)
-            .offset(y: 20)
+            .offset(y: 40)
             
             
             Image(moviePoster)
@@ -62,9 +62,9 @@ struct TrendingMovieCardView: View {
                 .scaledToFit()
                 .frame(height: 220)
                 .cornerRadius(12)
-                .offset(y: -60)
+                .offset(y: -35)
         }
-        .frame(width: 170, height: 360)
+        .frame(width: 170, height: 300)
         .cornerRadius(12)
         .shadow(radius: 5)
     }

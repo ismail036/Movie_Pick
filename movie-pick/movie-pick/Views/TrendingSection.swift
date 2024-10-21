@@ -16,9 +16,9 @@ struct TrendingSection: View {
             
             HStack(alignment: .bottom) {
                        Text("Trending")
-                    .font(.system(size: 22))
-                           .fontWeight(.bold)
-                           .foregroundColor(.white)
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
                        
                                               Button(action: {
                            selectedTab = "Today"

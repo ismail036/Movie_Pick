@@ -27,8 +27,9 @@ struct MovieView: View {
                     TrendingSection()
                     
                     Spacer().frame(height: 16)
-                    
+                
                     DiscoverSection()
+                    
                     
                     Spacer().frame(height: 50)
                     
