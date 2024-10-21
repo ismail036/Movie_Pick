@@ -20,6 +20,11 @@ struct MovieView: View {
             ) {
                 
                 WelcomeSection()
+                
+                Spacer().frame(height: 16)
+                
+                TrendingSection()
+                
 
             }
             .frame(maxWidth: .infinity,
