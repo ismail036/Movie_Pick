@@ -46,6 +46,12 @@ struct MovieView: View {
                     
                     PeopleSection()
                     
+                    Spacer().frame(height: 16)
+                    
+                    StreamingProvidersSection()
+
+                    
+                    
                     Spacer().frame(height: 50)
                     
 
