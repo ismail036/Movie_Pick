@@ -12,6 +12,7 @@ struct VerticalMovieCard: View {
     var moviePoster: String
     var rating: Int
     var releaseYear: String
+    var multiplier: CGFloat = 0.8
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -19,21 +20,21 @@ struct VerticalMovieCard: View {
                 Spacer()
                 
                 Text(movieTitle)
-                    .font(.system(size: 14))
+                    .font(.system(size: 14*multiplier))
                     .foregroundColor(.white)
                     .lineLimit(2)
-                    .padding(.leading, 8)
+                    .padding(.leading, 8*multiplier)
                 
                 Rectangle()
                     .fill(Color.clear)
                     .frame(height: 0)
                 
                 HStack {
-                    HStack(spacing: 2) {
+                    HStack(spacing: 2*multiplier) {
                         ForEach(0..<5) { index in
                             Image(systemName: index < rating ? "star.fill" : "star")
                                 .foregroundColor(.yellow)
-                                .font(.system(size: 12))
+                                .font(.system(size: 12*multiplier))
                         }
                     }
                     
@@ -41,30 +42,30 @@ struct VerticalMovieCard: View {
                     
                     
                     Text(releaseYear)
-                        .font(.system(size: 12))
+                        .font(.system(size: 12*multiplier))
                         .foregroundColor(.white)
                 }
-                .padding(.horizontal, 8)
-                .padding(.bottom, 8)
+                .padding(.horizontal, 8*multiplier)
+                .padding(.bottom, 8*multiplier)
                 
                 Rectangle()
                     .fill(Color.clear)
-                    .frame(height: 1)
+                    .frame(height: 1*multiplier)
             }
-            .frame(width: 165, height: 210)
+            .frame(width: 165*multiplier, height: 210*multiplier)
             .background(Color.mainColor3)
-            .cornerRadius(12)
-            .offset(y: 40)
+            .cornerRadius(12*multiplier)
+            .offset(y: 40*multiplier)
             
             
             Image(moviePoster)
                 .resizable()
                 .scaledToFit()
-                .frame(height: 220)
-                .cornerRadius(12)
-                .offset(y: -45)
+                .frame(height: 220*multiplier)
+                .cornerRadius(12*multiplier)
+                .offset(y: -45*multiplier)
         }
-        .frame(width: 170, height: 310)
+        .frame(width: 170*multiplier, height: 310*multiplier)
         .cornerRadius(12)
         .shadow(radius: 5)
     }

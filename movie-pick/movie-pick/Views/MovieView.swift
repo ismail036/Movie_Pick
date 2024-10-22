@@ -10,75 +10,47 @@ import SwiftUI
 struct MovieView: View {
     var body: some View {
         ZStack {
-            
             Color.mainColor1
-                            .ignoresSafeArea()
-            
+                .ignoresSafeArea()
             
             ScrollView {
-                VStack(
-                    alignment: .leading
-                ) {
-                    
+                VStack(alignment: .leading) {
                     WelcomeSection()
-                    
                     Spacer().frame(height: 16)
                     
                     TrendingSection()
-                    
                     Spacer().frame(height: 16)
-                
-                    DiscoverSection()
                     
+                    DiscoverSection() // Discover section already contains NavigationLinks
                     Spacer().frame(height: 32)
                     
                     ComingSoonSection()
-                    
                     Spacer().frame(height: 16)
                     
                     WatchlistSection()
-                    
                     Spacer().frame(height: 16)
                     
                     BoxOfficeView()
-                    
                     Spacer().frame(height: 16)
                     
                     PeopleSection()
-                    
                     Spacer().frame(height: 16)
                     
                     StreamingProvidersSection()
-                    
                     Spacer().frame(height: 16)
                     
                     NowPlayingSection()
-
-                    
-                    
                     Spacer().frame(height: 50)
-                    
-
                 }
-                .frame(maxWidth: .infinity,
-                       maxHeight: .infinity,
-                       alignment: .topLeading
-                )
-                .background(Color.mainColor1)
-                .padding(.horizontal,16)
-                .padding(.vertical,16)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 16)
             }
         }
-        .background(
-            Color.mainColor1
-        )
-        
-        
-
     }
-        
 }
 
 #Preview {
     MovieView()
 }
+ 

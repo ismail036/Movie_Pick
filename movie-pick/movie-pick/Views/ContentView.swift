@@ -1,12 +1,4 @@
-//
-//  ContentView.swift
-//  movie-pick
-//
-//  Created by İsmail Parlak on 21.10.2024.
-//
-
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
     
@@ -19,17 +11,17 @@ struct ContentView: View {
     }
 
     var body: some View {
-        ZStack {
-            Color.mainColor1
-                .ignoresSafeArea()
-            
-            TabView {
+        TabView {
+            NavigationView {
                 MovieView()
-                    .tabItem { Image(systemName: "list.bullet") }
             }
-            .background(Color.mainColor1)
-            .ignoresSafeArea(edges: .bottom) 
+            .tabItem {
+                Image(systemName: "list.bullet")
+                Text("Movies")
+            }
         }
+        .background(Color.mainColor1)
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
