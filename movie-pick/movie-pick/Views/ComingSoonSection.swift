@@ -94,7 +94,12 @@ struct ComingSoonSection: View {
                     }
                     
                     if !remainingCategories.isEmpty {
-                        CategoryButtonView(title: "More...", isMoreButton: true)
+                        NavigationLink(destination: ComingSoonDetail()) {
+                            CategoryButtonView(title: "More...")
+                        }
+                        .simultaneousGesture(TapGesture().onEnded {
+                            print("NavigationLink to DiscoverDetail was tapped")
+                        })
                     }
                 }
                 .onAppear {

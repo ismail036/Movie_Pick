@@ -1,13 +1,13 @@
 //
-//  DiscoverDetail.swift
+//  ComingSoonDetail.swift
 //  movie-pick
 //
-//  Created by İsmail Parlak on 22.10.2024.
+//  Created by İsmail Parlak on 23.10.2024.
 //
 
 import SwiftUI
 
-struct DiscoverDetail: View {
+struct ComingSoonDetail: View {
     @Environment(\.presentationMode) var presentationMode
 
     let genres = ["All Genres", "Action", "Adventure", "Animation", "Comedy", "Horror", "Sci-Fi"]
@@ -76,7 +76,7 @@ struct DiscoverDetail: View {
                 }
             }
             ToolbarItem(placement: .principal) {
-                Text("Discover")
+                Text("Coming Soon")
                     .font(.headline)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
@@ -135,6 +135,6 @@ struct DiscoverDetail: View {
 
 #Preview {
     NavigationView {
-        DiscoverDetail()
+        ComingSoonDetail()
     }
 }
