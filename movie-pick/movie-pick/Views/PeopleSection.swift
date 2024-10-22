@@ -18,11 +18,14 @@ struct PeopleSection: View {
                 
                 Spacer()
                 
-                Button(action: {
-                }) {
-                    Text("View More")
-                        .foregroundColor(.blue)
+                NavigationLink(destination: PopularPeopleDetail()) {
+                        Text("View More")
+                            .foregroundColor(.blue)
                 }
+                .simultaneousGesture(TapGesture().onEnded {
+                    print("NavigationLink to DiscoverDetail was tapped")
+                })
+
             }
             
             ScrollView(.horizontal, showsIndicators: false) {
