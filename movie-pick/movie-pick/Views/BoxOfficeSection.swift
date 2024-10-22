@@ -26,11 +26,15 @@ struct BoxOfficeView: View {
                 
                 Spacer()
                 
-                Button(action: {
-                }) {
-                    Text("View More")
-                        .foregroundColor(.blue)
+                NavigationLink(destination: BoxOfficeDetail()) {
+                        Text("View More")
+                            .foregroundColor(.blue)
                 }
+                .simultaneousGesture(TapGesture().onEnded {
+                    print("NavigationLink to DiscoverDetail was tapped")
+                })
+                
+                
             }
             
             Text("Weekend of Oct 4 - 6, 2024")
