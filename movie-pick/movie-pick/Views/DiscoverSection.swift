@@ -51,15 +51,17 @@ struct DiscoverSection: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    DiscoverMovieCardView(
-                        movieTitle: "Beetlejuice Beetlejuice Beetlejuice",
-                        releaseDate: "2023 Jul, 21",
-                        rating: 4,
-                        genres: ["Action", "Adventure", "Animation"],
-                        description: "After a family tragedy, three generations of the Deetz family return home to Winter River.",
-                        posterImage: "beetlejuice"
-                    )
-                    .frame(width: UIScreen.main.bounds.width * 0.95)
+                    NavigationLink(destination: MovieDetail()){
+                        DiscoverMovieCardView(
+                            movieTitle: "Beetlejuice Beetlejuice Beetlejuice",
+                            releaseDate: "2023 Jul, 21",
+                            rating: 4,
+                            genres: ["Action", "Adventure", "Animation"],
+                            description: "After a family tragedy, three generations of the Deetz family return home to Winter River.",
+                            posterImage: "beetlejuice"
+                        )
+                        .frame(width: UIScreen.main.bounds.width * 0.95)
+                    }
                 }
                 .padding(.horizontal, 0)
                 .padding(.vertical, 0)

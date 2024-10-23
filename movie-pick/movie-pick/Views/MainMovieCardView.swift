@@ -49,9 +49,7 @@ struct MainMovieCardView: View {
                 }
                 
                 
-                
-                Button(action: {
-                }) {
+                NavigationLink(destination: MovieDetail()){
                     Text("Details")
                         .font(.subheadline)
                         .padding(.horizontal, 12)
