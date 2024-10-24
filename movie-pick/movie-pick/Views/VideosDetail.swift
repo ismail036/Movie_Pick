@@ -52,7 +52,7 @@ struct VideosDetail: View {
                             WebImage(url: video.thumbnailURL)
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
-                                .frame(width: 180, height: 170) /
+                                .frame(width: 180, height: 170)
                                 .clipped()
                                 .cornerRadius(8)
                             
