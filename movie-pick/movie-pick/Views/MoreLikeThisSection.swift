@@ -32,6 +32,7 @@ struct MoreLikeThisSection: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
                     VerticalMovieCard(
+                        selectedDestination:Destination.movieDetail,
                         movieTitle: "S.O.S. Bikini Bottom : Une mission pour Sandy Écureuil",
                         moviePoster: "bikini_bottom",
                         rating: 0,
@@ -39,6 +40,7 @@ struct MoreLikeThisSection: View {
                     )
                     
                     VerticalMovieCard(
+                        selectedDestination:Destination.movieDetail,
                         movieTitle: "Venom: The Last Dance",
                         moviePoster: "venom",
                         rating: 0,
@@ -46,6 +48,7 @@ struct MoreLikeThisSection: View {
                     )
                     
                     VerticalMovieCard(
+                        selectedDestination:Destination.movieDetail,
                         movieTitle: "Smile 2",
                         moviePoster: "smile",
                         rating: 0,

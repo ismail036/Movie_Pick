@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct WelcomeSection: View {
+    var text: String
+    
     var body: some View {
         VStack(alignment: (.leading)) {
-            Text("Welcome")
+            Text(text)
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(.clear)                             .overlay(
@@ -20,7 +22,7 @@ struct WelcomeSection: View {
                         endPoint: .trailing
                     )
                     .mask(
-                        Text("Welcome")
+                        Text(text)
                             .font(.largeTitle)
                             .fontWeight(.bold)
                     )
@@ -43,5 +45,5 @@ struct WelcomeSection: View {
 }
 
 #Preview {
-    WelcomeSection()
+    WelcomeSection(text: "Welcome")
 }

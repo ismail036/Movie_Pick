@@ -24,6 +24,11 @@ struct ContentView: View {
                             .resizable()
                             .frame(width: 20, height: 20)
                         Text("Movies")
+                    }else if selectedTab == 0 {
+                        Image("movieSelectedIcon")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                        Text("Movies")
                     } else {
                         Image("MovieIcon")
                             .resizable()
@@ -35,7 +40,7 @@ struct ContentView: View {
             .tag(0)
             
             NavigationView {
-                MovieView()
+                ShowView()
             }
             .tabItem {
                 VStack {

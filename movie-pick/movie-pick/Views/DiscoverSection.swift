@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct DiscoverSection: View {
+    
+    
+    var text:String
 
     let categories = ["Action", "Adventure", "Animation", "Comedy", "Horror", "Sci-Fi"]
     @State private var visibleCategories: [String] = []
@@ -100,7 +103,7 @@ extension String {
 }
 
 #Preview {
-    DiscoverSection()
+    DiscoverSection(text: "Explore Movies and uncover new favorites")
 }
 
 

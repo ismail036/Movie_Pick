@@ -30,6 +30,7 @@ struct MoreLikeThisDetail: View {
                     ], spacing: 8) {
                         ForEach(0..<5, id: \.self) { _ in
                         VerticalMovieCard(
+                            selectedDestination:Destination.movieDetail,
                             movieTitle: "Deadpool & Wolverine",
                             moviePoster: "deadpool_wolverine",
                             rating: 4,
@@ -39,6 +40,7 @@ struct MoreLikeThisDetail: View {
                         )
 
                         VerticalMovieCard(
+                            selectedDestination:Destination.movieDetail,
                             movieTitle: "Bad Boys: Ride or Die",
                             moviePoster: "bad_boys",
                             rating: 4,
@@ -48,8 +50,10 @@ struct MoreLikeThisDetail: View {
                         )
 
                         VerticalMovieCard(
+                            selectedDestination:Destination.movieDetail,
                             movieTitle: "Despicable Me 4",
                             moviePoster: "despicable",
+
                             rating: 4,
                             releaseYear: "2024",
                             multiplier: UIScreen.main.bounds.width < 375 ? 0.6 :

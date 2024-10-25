@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct PeopleSection: View {
+    var text:String
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack{
-                Text("Popular People")
+                Text(text)
                     .font(.title) // Reduced font size
                     .fontWeight(.bold)
                     .foregroundColor(.white)
@@ -32,17 +34,20 @@ struct PeopleSection: View {
                 HStack(spacing: 10) {
                     VerticalPeopleCardView(
                         name: "Tom Holland",
-                        peopleCard: "tom_holand"
+                        peopleCard: "tom_holand",
+                        scale: 1
                     )
                     
                     VerticalPeopleCardView(
                         name: "Jason Statham",
-                        peopleCard: "jason"
+                        peopleCard: "jason",
+                        scale: 1
                     )
                     
                     VerticalPeopleCardView(
                         name: "Margot Robbie",
-                        peopleCard: "margot"
+                        peopleCard: "margot",
+                        scale: 1
                     )
 
                 }
@@ -60,5 +65,5 @@ struct PeopleSection: View {
 }
 
 #Preview {
-    PeopleSection()
+    PeopleSection(text:"Popular People")
 }

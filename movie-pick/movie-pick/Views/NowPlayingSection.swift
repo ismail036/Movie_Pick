@@ -8,14 +8,18 @@
 import SwiftUI
 
 struct NowPlayingSection: View {
+    
+    var title1:String
+    var title2:String
+    
   var body: some View {
         VStack(alignment: .leading) {
-            Text("Now Playing")
+            Text(title1)
                 .font(.title)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
             
-            Text("Current  Films on Big Screens")
+            Text(title2)
                 .font(.subheadline)
                 .foregroundColor(.gray)
 
@@ -24,6 +28,7 @@ struct NowPlayingSection: View {
                 HStack {
                     
                     VerticalMovieCard(
+                        selectedDestination:Destination.movieDetail,
                         movieTitle: "Deadpool & Wolverine",
                         moviePoster: "deadpool_wolverine",
                         rating: 5,
@@ -31,6 +36,7 @@ struct NowPlayingSection: View {
                     )
                     
                     VerticalMovieCard(
+                        selectedDestination:Destination.movieDetail,
                         movieTitle: "Bad Boys: Ride or Die",
                         moviePoster: "bad_boys",
                         rating: 4,
@@ -38,13 +44,16 @@ struct NowPlayingSection: View {
                     )
                     
                     VerticalMovieCard(
+                        selectedDestination:Destination.movieDetail,
                         movieTitle: "Despicable Me 4",
                         moviePoster: "despicable",
+
                         rating: 3,
                         releaseYear: "2024"
                     )
                     
                     VerticalMovieCard(
+                        selectedDestination:Destination.movieDetail,
                         movieTitle: "Deadpool & Wolverine",
                         moviePoster: "deadpool_wolverine",
                         rating: 5,
@@ -58,5 +67,5 @@ struct NowPlayingSection: View {
 }
 
 #Preview {
-    NowPlayingSection()
+    NowPlayingSection(title1: "Now Playing", title2: "Current  Films on Big Screens")
 }

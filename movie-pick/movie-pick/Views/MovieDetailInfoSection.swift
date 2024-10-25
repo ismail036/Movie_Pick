@@ -103,6 +103,7 @@ struct MovieDetailInfoSection: View {
                     }
                     .padding(.horizontal,5)
                     
+                    
                     Button(action: {
                     }) {
                         VStack {
@@ -129,84 +130,79 @@ struct MovieDetailInfoSection: View {
             
             
             HStack {
-                HStack {
-                    HStack {
+                HStack() {
+
                         Image(systemName: "star.fill")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 16, height: 16)
                             .foregroundColor(.white)
-                            .padding(.leading, 12)
-                        
+                            .padding(.leading, 20)
+                            .padding(.vertical,6)
                         Text("8.5")
                             .foregroundColor(.white)
                             .font(.system(size: 10))
-                    }
-                    .padding(.vertical,4)
                     
                     Rectangle()
                         .fill(Color.white)
-                        .frame(width: 1, height: 16)
+                        .frame(width: 1, height: 18)
                         .padding(0)
                     
-                    HStack {
+
                         Image(systemName: "person.fill")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 12, height: 12)
+                            .frame(width: 14, height: 14)
                             .foregroundColor(.white)
                         
                         Text("456")
                             .foregroundColor(.white)
-                            .font(.system(size: 10))
-                            .padding(.trailing, 12)
-                    }
+                            .font(.system(size: 12))
+                            .frame(minWidth: 0, maxWidth: 45, alignment: .leading)
                 }
                 .background(Color.green)
                 .cornerRadius(16)
-                .padding(.vertical, 8)
                 
-                
-                
+                Spacer()
                 
                             
                 HStack {
                      Image(systemName: "timer")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 12, height: 12)
+                        .frame(width: 14, height: 14)
                         .foregroundColor(.white)
                         .padding(.leading, 12)
-                        .padding(.vertical,6)
+                        .padding(.vertical,7.5)
                     
                     Text("1 hr 40 Min")
                         .foregroundColor(.white)
-                        .font(.system(size: 12))
-                        .padding(.trailing, 12)
+                        .font(.system(size: 14))
+                        .padding(.trailing, 14)
                 }
                 .background(Color.blue)
                 .cornerRadius(16)
                 .padding(.vertical, 8)
                 
-                
 
-                
+                Spacer()
                 
                 VStack(alignment: .trailing) {
                        Text("Release Date")
                         .foregroundColor(.white)
-                        .font(.system(size: 10))
+                        .font(.system(size: 12))
                         .bold()
                         
                         Text("September 27, 2024")
                             .foregroundColor(.white)
-                            .font(.system(size: 10))
+                            .font(.system(size: 12))
                             .bold()
                 }
                 
                 
             }
-            .padding(0)
+            .padding(.vertical , 14)
+            .padding(.horizontal , 14)
 
         
             
