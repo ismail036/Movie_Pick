@@ -1,0 +1,29 @@
+{
+  "configurations" : [
+    {
+      "id" : "2C4BCE03-701F-4D6F-9715-BD97DB1C7384",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:movie-pick.xcodeproj",
+      "identifier" : "5A674EB02CC643DC00EE2809",
+      "name" : "movie-pick"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:movie-pick.xcodeproj",
+        "identifier" : "5A86DA072CCCF1C900848C78",
+        "name" : "movie-pickTests"
+      }
+    }
+  ],
+  "version" : 1
+}

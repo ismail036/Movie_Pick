@@ -1,7 +1,10 @@
 import SwiftUI
 
+import SwiftUI
+
 struct ContentView: View {
     @State private var selectedTab = 0
+    private let tmdbService = TMDBService() // TMDBService örneği
     
     init() {
         let appearance = UITabBarAppearance()
@@ -53,7 +56,6 @@ struct ContentView: View {
             }
             .tag(1)
             
-            
             NavigationView {
                 SearchView()
             }
@@ -73,7 +75,6 @@ struct ContentView: View {
                 }
             }
             .tag(2)
-            
             
             NavigationView {
                 LibraryView()
@@ -95,7 +96,6 @@ struct ContentView: View {
             }
             .tag(3)
             
-            
             NavigationView {
                 SettingsView()
             }
@@ -115,12 +115,24 @@ struct ContentView: View {
                 }
             }
             .tag(4)
-
-            
-            
         }
         .background(Color.mainColor1)
         .navigationViewStyle(StackNavigationViewStyle())
+        .onAppear {
+            fetchPopularMovies()
+        }
+    }
+    
+    // Popüler filmleri çağıran fonksiyon
+    private func fetchPopularMovies() {
+        tmdbService.fetchPopularMovies { result in
+            switch result {
+            case .success(let movies):
+                print("Fetched popular movies:", movies)
+            case .failure(let error):
+                print("Error fetching popular movies:", error.localizedDescription)
+            }
+        }
     }
 }
 

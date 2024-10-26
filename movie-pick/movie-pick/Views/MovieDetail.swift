@@ -8,32 +8,54 @@
 import SwiftUI
 
 struct MovieDetail: View {
+    
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedTab = 0
     @State private var isSticky = false
     let stickyThreshold = UIScreen.main.bounds.height * 0.35
+    let movie: MovieModel 
 
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                Image("platform")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(height: UIScreen.main.bounds.height * 0.25)
-                    .clipped()
-                    .edgesIgnoringSafeArea(.top)
+                if let backdropURL = movie.backdropURL {
+                    AsyncImage(url: backdropURL) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: UIScreen.main.bounds.height * 0.25)
+                            .clipped()
+                            .edgesIgnoringSafeArea(.top)
+                    } placeholder: {
+                        Color.gray
+                            .frame(height: UIScreen.main.bounds.height * 0.25)
+                            .clipped()
+                            .edgesIgnoringSafeArea(.top)
+                    }
+                }
 
                 VStack {
                     Spacer()
 
                     HStack(alignment: .center) {
-                        Image("platform_poster")
-                            .resizable()
-                            .frame(width: 120, height: 180)
-                            .cornerRadius(10)
-                            .shadow(radius: 10)
-                            .offset(y: 40)
-                            .padding(.horizontal, 16)
+                        if let posterURL = movie.posterURL {
+                            AsyncImage(url: posterURL) { image in
+                                image
+                                    .resizable()
+                                    .frame(width: 120, height: 180)
+                                    .cornerRadius(10)
+                                    .shadow(radius: 10)
+                                    .offset(y: 40)
+                                    .padding(.horizontal, 16)
+                            } placeholder: {
+                                Color.gray
+                                    .frame(width: 120, height: 180)
+                                    .cornerRadius(10)
+                                    .shadow(radius: 10)
+                                    .offset(y: 40)
+                                    .padding(.horizontal, 16)
+                            }
+                        }
 
                         Spacer()
 
@@ -57,7 +79,9 @@ struct MovieDetail: View {
             ScrollView {
                 VStack(spacing: 20) {
                     // Movie Detail Info Section
-                    MovieDetailInfoSection()
+                    MovieDetailInfoSection(movie: MovieModel(
+                        id: 1184918, title: "The Wild Robot", originalTitle: Optional("The Wild Robot"), overview: "After a shipwreck, an intelligent robot called Roz is stranded on an uninhabited island. To survive the harsh environment, Roz bonds with the island\'s animals and cares for an orphaned baby goose.", posterPath: Optional("/wTnV3PCVW5O92JMrFvvrRcV39RU.jpg"), backdropPath: Optional("/417tYZ4XUyJrtyZXj7HpvWf1E8f.jpg"), releaseDate: Optional("2024-09-12"), runtime: nil, voteAverage: Optional(8.641), voteCount: Optional(1514), genreIds: Optional([16, 878, 10751]), genres: nil, popularity: Optional(5400.805), originalLanguage: Optional("en"), adult: Optional(false), budget: nil, revenue: nil, tagline: nil, homepage: nil, status: nil
+                    )) // Movie detayları burada gösteriliyor
 
                     GeometryReader { geo in
                         let offset = geo.frame(in: .global).minY
@@ -77,9 +101,8 @@ struct MovieDetail: View {
                             .background(Color.mainColor1)
                     }
                     
-                    // Sekme içerikleri
                     if selectedTab == 0 {
-                        OverviewTab()
+                        OverviewTab(movieID: movie.id)
                     } else if selectedTab == 1 {
                         PhotosAndVideosTab()
                     } else {
@@ -123,7 +146,6 @@ struct MovieDetail: View {
         .background(Color.mainColor1)
     }
 }
-
 // Sticky TabButtons Bileşeni
 struct TabButtonsView: View {
     @Binding var selectedTab: Int
@@ -180,6 +202,6 @@ struct TabButton: View {
 
 #Preview {
     NavigationView {
-        MovieDetail()
+        MovieDetail(movie: MovieModel(id: 1184918, title: "The Wild Robot", originalTitle: Optional("The Wild Robot"), overview: "After a shipwreck, an intelligent robot called Roz is stranded on an uninhabited island. To survive the harsh environment, Roz bonds with the island\'s animals and cares for an orphaned baby goose.", posterPath: Optional("/wTnV3PCVW5O92JMrFvvrRcV39RU.jpg"), backdropPath: Optional("/417tYZ4XUyJrtyZXj7HpvWf1E8f.jpg"), releaseDate: Optional("2024-09-12"), runtime: nil, voteAverage: Optional(8.641), voteCount: Optional(1514), genreIds: Optional([16, 878, 10751]), genres: nil, popularity: Optional(5400.805), originalLanguage: Optional("en"), adult: Optional(false), budget: nil, revenue: nil, tagline: nil, homepage: nil, status: nil))
     }
 }

@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct OverviewTab: View {
+    
     @State private var showFullText = false
+    var movieID : Int
     
     let description = """
     After a mysterious leader imposes his law in a brutal system of vertical cells, a new arrival battles against a dubious food distribution method. The system is designed in such a way that the top floors receive an abundance of food, while the lower floors struggle with starvation, causing people to fight for survival. The newcomer seeks a way to disrupt this dystopian order, while grappling with his own morality and the challenges of the brutal environment.
@@ -59,5 +61,5 @@ struct OverviewTab: View {
 }
 
 #Preview {
-    OverviewTab()
+    OverviewTab(movieID: 1184918)
 }

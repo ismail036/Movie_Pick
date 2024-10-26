@@ -10,8 +10,20 @@
 		5AB9772E2CC8FF03009D51C4 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5AB9772D2CC8FF03009D51C4 /* SDWebImageSwiftUI */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		5A86DA0C2CCCF1C900848C78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A674EA92CC643DC00EE2809 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A674EB02CC643DC00EE2809;
+			remoteInfo = "movie-pick";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		5A674EB12CC643DC00EE2809 /* movie-pick.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "movie-pick.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A86DA082CCCF1C900848C78 /* movie-pickTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "movie-pickTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A86DA112CCCF4C500848C78 /* movie-pick.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "movie-pick.xctestplan"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -31,12 +43,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5A86DA052CCCF1C900848C78 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		5A674EA82CC643DC00EE2809 = {
 			isa = PBXGroup;
 			children = (
+				5A86DA112CCCF4C500848C78 /* movie-pick.xctestplan */,
 				5A674EB32CC643DC00EE2809 /* movie-pick */,
 				5A674EB22CC643DC00EE2809 /* Products */,
 			);
@@ -46,6 +66,7 @@
 			isa = PBXGroup;
 			children = (
 				5A674EB12CC643DC00EE2809 /* movie-pick.app */,
+				5A86DA082CCCF1C900848C78 /* movie-pickTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -76,6 +97,26 @@
 			productReference = 5A674EB12CC643DC00EE2809 /* movie-pick.app */;
 			productType = "com.apple.product-type.application";
 		};
+		5A86DA072CCCF1C900848C78 /* movie-pickTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A86DA0E2CCCF1C900848C78 /* Build configuration list for PBXNativeTarget "movie-pickTests" */;
+			buildPhases = (
+				5A86DA042CCCF1C900848C78 /* Sources */,
+				5A86DA052CCCF1C900848C78 /* Frameworks */,
+				5A86DA062CCCF1C900848C78 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5A86DA0D2CCCF1C900848C78 /* PBXTargetDependency */,
+			);
+			name = "movie-pickTests";
+			packageProductDependencies = (
+			);
+			productName = "movie-pickTests";
+			productReference = 5A86DA082CCCF1C900848C78 /* movie-pickTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -88,6 +129,10 @@
 				TargetAttributes = {
 					5A674EB02CC643DC00EE2809 = {
 						CreatedOnToolsVersion = 16.0;
+					};
+					5A86DA072CCCF1C900848C78 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 5A674EB02CC643DC00EE2809;
 					};
 				};
 			};
@@ -109,12 +154,20 @@
 			projectRoot = "";
 			targets = (
 				5A674EB02CC643DC00EE2809 /* movie-pick */,
+				5A86DA072CCCF1C900848C78 /* movie-pickTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		5A674EAF2CC643DC00EE2809 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A86DA062CCCF1C900848C78 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -131,7 +184,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5A86DA042CCCF1C900848C78 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5A86DA0D2CCCF1C900848C78 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A674EB02CC643DC00EE2809 /* movie-pick */;
+			targetProxy = 5A86DA0C2CCCF1C900848C78 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		5A674EBF2CC643DD00EE2809 /* Debug */ = {
@@ -311,6 +379,42 @@
 			};
 			name = Release;
 		};
+		5A86DA0F2CCCF1C900848C78 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F33M7VP8QL;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.movie-pickTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/movie-pick.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/movie-pick";
+			};
+			name = Debug;
+		};
+		5A86DA102CCCF1C900848C78 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F33M7VP8QL;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.movie-pickTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/movie-pick.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/movie-pick";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -328,6 +432,15 @@
 			buildConfigurations = (
 				5A674EC22CC643DD00EE2809 /* Debug */,
 				5A674EC32CC643DD00EE2809 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5A86DA0E2CCCF1C900848C78 /* Build configuration list for PBXNativeTarget "movie-pickTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A86DA0F2CCCF1C900848C78 /* Debug */,
+				5A86DA102CCCF1C900848C78 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
