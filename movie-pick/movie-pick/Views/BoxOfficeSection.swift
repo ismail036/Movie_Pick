@@ -8,33 +8,23 @@
 import SwiftUI
 
 struct BoxOfficeView: View {
-    let movies = [
-        ("Joker: Folie à Deux", "$40M"),
-        ("The Wild Robot", "$64M"),
-        ("Beetlejuice Beetlejuice", "$265M"),
-        ("Transformers One", "$47M"),
-        ("Speak No Evil", "$33M")
-    ]
+    @State private var movies: [MovieModel] = []
+    private let tmdbService = TMDBService()
     
     var body: some View {
         VStack(alignment: .leading) {
-            HStack{
+            HStack {
                 Text("World Box Office")
-                    .font(.title) // Reduced font size
+                    .font(.title)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                 
                 Spacer()
                 
                 NavigationLink(destination: BoxOfficeDetail()) {
-                        Text("View More")
-                            .foregroundColor(.blue)
+                    Text("View More")
+                        .foregroundColor(.blue)
                 }
-                .simultaneousGesture(TapGesture().onEnded {
-                    print("NavigationLink to DiscoverDetail was tapped")
-                })
-                
-                
             }
             
             Text("Weekend of Oct 4 - 6, 2024")
@@ -42,40 +32,51 @@ struct BoxOfficeView: View {
                 .foregroundColor(.gray)
                 .padding(.bottom, 5)
             
-            ForEach(0..<movies.count, id: \.self) { index in
+            ForEach(movies.prefix(5), id: \.id) { movie in
                 HStack {
-                    Text("\(index + 1)")
+                    Text("\(movies.firstIndex(where: { $0.id == movie.id })! + 1)")
                         .font(.system(size: 28))
                         .fontWeight(.bold)
                         .foregroundColor(Color.cyanBlue)
                     
                     Rectangle()
-                                .fill(LinearGradient(
-                                    gradient: Gradient(colors: [Color("MainColor2Primary"), Color("MainColor2Secondary")]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                ))
-                                .frame(width: 2, height: 16)
-                                    
+                        .fill(LinearGradient(
+                            gradient: Gradient(colors: [Color("MainColor2Primary"), Color("MainColor2Secondary")]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ))
+                        .frame(width: 2, height: 16)
+                    
                     VStack(alignment: .leading) {
-                        Text(movies[index].0)
+                        Text(movie.title)
                             .font(.callout)
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
                         
-                        Text("Total Gross: \(movies[index].1)")
+                        Text("Total Gross: $\(movie.revenue ?? 0)")
                             .font(.caption)
                             .foregroundColor(.gray)
                     }
                     
                     Spacer()
                 }
-
             }
-                    }
+        }
         .background(Color.black.edgesIgnoringSafeArea(.all))
+        .onAppear {
+            tmdbService.fetchWeeklyBoxOfficeWithRevenue { result in
+                switch result {
+                case .success(let movies):
+                    self.movies = movies
+                case .failure(let error):
+                    print("Error fetching weekly box office movies: \(error)")
+                }
+            }
+        }
     }
 }
+
+
 
 #Preview {
     BoxOfficeView()

@@ -394,6 +394,108 @@ class TMDBService {
         }
         task.resume()
     }
+    
+    
+    func fetchWeeklyBoxOffice(completion: @escaping (Result<[MovieModel], Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/movie/now_playing"
+        guard let url = URL(string: endpoint) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching weekly box office movies: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for weekly box office movies")
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let response = try decoder.decode(MovieResponse.self, from: data)
+                completion(.success(response.results))
+            } catch {
+                print("Error decoding weekly box office movies: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+
+
+    func fetchWeeklyBoxOfficeWithRevenue(completion: @escaping (Result<[MovieModel], Error>) -> Void) {
+        fetchWeeklyBoxOffice { result in
+            switch result {
+            case .success(let movies):
+                var moviesWithRevenue: [MovieModel] = []
+                let dispatchGroup = DispatchGroup()
+                
+                for movie in movies {
+                    dispatchGroup.enter()
+                    self.fetchMovieById(movieId: movie.id) { result in
+                        switch result {
+                        case .success(let detailedMovie):
+                            moviesWithRevenue.append(detailedMovie)
+                        case .failure(let error):
+                            print("Error fetching revenue for movie \(movie.id): \(error)")
+                        }
+                        dispatchGroup.leave()
+                    }
+                }
+                
+                dispatchGroup.notify(queue: .main) {
+                    completion(.success(moviesWithRevenue))
+                }
+                
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    
+    
+    func fetchPopularPeople(completion: @escaping (Result<[PersonModel], Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/person/popular"
+        guard let url = URL(string: endpoint) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching popular people: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for popular people")
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let response = try decoder.decode(PeopleResponse.self, from: data)
+                completion(.success(response.results))
+            } catch {
+                print("Error decoding popular people: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
 
 }
 
@@ -439,3 +541,17 @@ struct AuthorDetails: Codable {
     let rating: Double?
 }
 
+struct PeopleResponse: Codable {
+    let results: [PersonModel]
+}
+
+struct PersonModel: Codable, Identifiable {
+    let id: Int
+    let name: String
+    let profilePath: String?
+    
+    var profileURL: URL? {
+        guard let path = profilePath else { return nil }
+        return URL(string: "https://image.tmdb.org/t/p/w200\(path)")
+    }
+}

@@ -14,55 +14,63 @@ struct BoxOfficeMovieCard: View {
     var weekendGross: String
     var week: Int
 
-    
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            
-            Image(posterImage)
-                .resizable()
+            // Resmi URL'den yüklüyoruz
+            if let url = URL(string: posterImage) {
+                AsyncImage(url: url) { image in
+                    image.resizable()
+                } placeholder: {
+                    Color.gray
+                }
                 .scaledToFill()
                 .frame(width: 120, height: 180)
                 .cornerRadius(12)
+            } else {
+                Color.gray
+                    .frame(width: 120, height: 180)
+                    .cornerRadius(12)
+            }
             
             VStack(alignment: .leading) {
-                
                 Text(movieTitle)
+                    .font(.headline)
                     .foregroundColor(.white)
-                    .padding(.vertical,2)
-                    
+                    .padding(.vertical, 2)
+                
                 Text("Total Gross: \(totalGross)")
+                    .font(.subheadline)
                     .foregroundColor(.white)
-                    .padding(.vertical,2)
+                    .padding(.vertical, 2)
                 
                 Text("Weekend Gross: \(weekendGross)")
+                    .font(.subheadline)
                     .foregroundColor(.white)
-                    .padding(.vertical,2)
+                    .padding(.vertical, 2)
                 
                 Text("Week: \(week)")
+                    .font(.subheadline)
                     .foregroundColor(.white)
-                    .padding(.vertical,2)
-                
+                    .padding(.vertical, 2)
             }
             .padding()
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.mainColor1)
             .cornerRadius(20)
         }
         .frame(maxWidth: .infinity)
         .background(Color.mainColor1)
         .cornerRadius(20)
-        .padding(.leading, 0)
-        .padding(.trailing, 0)
-
+        .padding(.horizontal, 8)
     }
 }
 
 #Preview {
     BoxOfficeMovieCard(
-        posterImage: "beetlejuice",
+        posterImage: "https://image.tmdb.org/t/p/w500/beetlejuice.jpg",
         movieTitle: "Beetlejuice Beetlejuice Beetlejuice",
         totalGross: "$40M",
-        weekendGross: "$40$",
+        weekendGross: "$40M",
         week: 1
     )
 }

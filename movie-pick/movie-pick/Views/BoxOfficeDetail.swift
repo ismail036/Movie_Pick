@@ -7,21 +7,24 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct BoxOfficeDetail: View {
     @Environment(\.presentationMode) var presentationMode
+    @State private var movies: [MovieModel] = []
+    private let tmdbService = TMDBService()
 
-    
     var body: some View {
-        VStack{
+        VStack {
             ScrollView {
                 VStack(alignment: .leading) {
-                    ForEach(0..<10) {i in
+                    ForEach(movies, id: \.id) { movie in
                         BoxOfficeMovieCard(
-                            posterImage: "beetlejuice",
-                            movieTitle: "Beetlejuice Beetlejuice Beetlejuice",
-                            totalGross: "$40M",
-                            weekendGross: "$40$",
-                            week: 1
+                            posterImage: movie.posterURL?.absoluteString ?? "",
+                            movieTitle: movie.title,
+                            totalGross: "$\(movie.revenue ?? 0)",
+                            weekendGross: "$\(movie.popularity ?? 0)", // hafta içi hasılat olarak popularity kullanıyoruz
+                            week: movie.weeksInTheater ?? 1 
                         )
                     }
                 }
@@ -50,10 +53,20 @@ struct BoxOfficeDetail: View {
         }
         .toolbarBackground(Color.mainColor1, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+        .onAppear {
+            tmdbService.fetchWeeklyBoxOfficeWithRevenue { result in
+                switch result {
+                case .success(let movies):
+                    self.movies = movies
+                case .failure(let error):
+                    print("Error fetching weekly box office details: \(error)")
+                }
+            }
+        }
     }
-    
 }
 
 #Preview {
-        BoxOfficeDetail()
+    BoxOfficeDetail()
 }
+

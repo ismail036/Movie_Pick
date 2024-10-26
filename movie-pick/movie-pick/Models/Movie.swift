@@ -49,3 +49,26 @@ struct Genre: Codable, Identifiable {
     let id: Int
     let name: String
 }
+
+extension MovieModel {
+    var weeksInTheater: Int {
+        guard let releaseDateString = releaseDate else {
+            return 1
+        }
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        
+        guard let releaseDate = formatter.date(from: releaseDateString) else {
+            return 1
+        }
+        
+        let calendar = Calendar.current
+        let currentDate = Date()
+        
+        let components = calendar.dateComponents([.weekOfYear], from: releaseDate, to: currentDate)
+        
+        // Haftaları hesaplayın ve eğer 0 veya daha azsa 1 olarak döndürün
+        return max(components.weekOfYear ?? 1, 1)
+    }
+}
