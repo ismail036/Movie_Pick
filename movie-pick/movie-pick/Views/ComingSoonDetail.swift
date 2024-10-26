@@ -12,15 +12,16 @@ struct ComingSoonDetail: View {
 
     let genres = ["All Genres", "Action", "Adventure", "Animation", "Comedy", "Horror", "Sci-Fi"]
     @State private var selectedGenres: [String] = []
+    @State private var allGenres: [Genre] = []
+    @State private var comingSoonMovies: [MovieModel] = []
+    @State private var filteredMovies: [MovieModel] = []
 
     var body: some View {
         VStack {
-            
             genreScrollView
-            
+
             ScrollView {
                 VStack(alignment: .leading) {
-
                     let cardWidth = (UIScreen.main.bounds.width - 48) / 3
 
                     LazyVGrid(columns: [
@@ -28,14 +29,12 @@ struct ComingSoonDetail: View {
                         GridItem(.fixed(cardWidth), spacing: 8),
                         GridItem(.fixed(cardWidth), spacing: 8)
                     ], spacing: 8) {
-                        ForEach(0..<5, id: \.self) { _ in
+                        ForEach(filteredMovies) { movie in
                             VerticalMovieCard(
                                 selectedDestination: .movieDetail,
-                                movieId: 1232454
+                                movieId: movie.id,
+                                multiplier: 0.7
                             )
-
-                            
-                            
                         }
                     }
                     .padding(.horizontal)
@@ -43,6 +42,10 @@ struct ComingSoonDetail: View {
             }
         }
         .background(Color.mainColor1)
+        .onAppear {
+            fetchGenres()
+            fetchComingSoonMovies()
+        }
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -74,6 +77,7 @@ struct ComingSoonDetail: View {
                     Button(action: {
                         if genre == "All Genres" {
                             selectedGenres.removeAll()
+                            filteredMovies = comingSoonMovies
                         } else {
                             if selectedGenres.contains("All Genres") {
                                 selectedGenres.removeAll { $0 == "All Genres" }
@@ -83,6 +87,7 @@ struct ComingSoonDetail: View {
                             } else {
                                 selectedGenres.append(genre)
                             }
+                            applyGenreFilter()
                         }
                     }) {
                         HStack(spacing: 4) {
@@ -98,22 +103,71 @@ struct ComingSoonDetail: View {
                                     .frame(width: 16, height: 16)
                                     .background(Color.white)
                                     .clipShape(Circle())
-                                    .padding(.trailing,8)
+                                    .padding(.trailing, 8)
                             }
                         }
                     }
                     .background(selectedGenres.contains(genre) ? Color.blue : Color.blue.opacity(0.3))
                     .cornerRadius(20)
-
-
                 }
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
         }
     }
+
+    private func fetchGenres() {
+        TMDBService().fetchGenres { result in
+            switch result {
+            case .success(let genres):
+                DispatchQueue.main.async {
+                    self.allGenres = genres
+                }
+            case .failure(let error):
+                print("Failed to fetch genres: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func fetchComingSoonMovies() {
+        let startDate = Date().toString(format: "yyyy-MM-dd")
+        let endDate = Calendar.current.date(byAdding: .month, value: 1, to: Date())?.toString(format: "yyyy-MM-dd") ?? startDate
+
+        TMDBService().fetchComingSoonMovies(startDate: startDate, endDate: endDate) { result in
+            switch result {
+            case .success(let movies):
+                DispatchQueue.main.async {
+                    self.comingSoonMovies = movies
+                    self.filteredMovies = movies
+                }
+            case .failure(let error):
+                print("Failed to fetch coming soon movies: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func applyGenreFilter() {
+        if selectedGenres.isEmpty {
+            filteredMovies = comingSoonMovies
+        } else {
+            filteredMovies = comingSoonMovies.filter { movie in
+                let movieGenreNames = movie.genreIds?.compactMap { genreId in
+                    allGenres.first { $0.id == genreId }?.name
+                } ?? []
+                return !Set(selectedGenres).isDisjoint(with: movieGenreNames)
+            }
+        }
+    }
+}
+
+extension Date {
+    func toString(format: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = format
+        return dateFormatter.string(from: self)
+    }
 }
 
 #Preview {
-        ComingSoonDetail()
+    ComingSoonDetail()
 }

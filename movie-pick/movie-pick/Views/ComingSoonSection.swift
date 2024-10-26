@@ -14,9 +14,10 @@ struct ComingSoonSection: View {
     
     @State private var showDropdown = false
     @State private var selectedTimeFrame = "Next 30 Days"
-
-    var timeFrames = ["Next 24 Hours", "Next 30 Days", "Next 3 Months", "Next 12 Months"]
-
+    @State private var comingSoonMovies: [MovieModel] = [] // Coming soon filmlerini tutar
+    
+    let timeFrames = ["Next 24 Hours", "Next 30 Days", "Next 3 Months", "Next 12 Months"]
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -53,6 +54,7 @@ struct ComingSoonSection: View {
                                 Button(action: {
                                     selectedTimeFrame = timeFrame
                                     showDropdown = false
+                                    fetchComingSoonMovies()
                                 }) {
                                     HStack {
                                         Text(timeFrame)
@@ -75,7 +77,7 @@ struct ComingSoonSection: View {
                         }
                         .background(Color.mainColor3)
                         .cornerRadius(12)
-                        .frame(width: 200 , height: 0)
+                        .frame(width: 200)
                         .shadow(radius: 5)
                         .offset(y: 140)
                         .zIndex(1)
@@ -111,26 +113,12 @@ struct ComingSoonSection: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    VerticalMovieCard(
-                        selectedDestination: .movieDetail,
-                        movieId: 1232454
-                    )
-                    VerticalMovieCard(
-                        selectedDestination: .movieDetail,
-                        movieId: 1232454
-                    )
-                    VerticalMovieCard(
-                        selectedDestination: .movieDetail,
-                        movieId: 1232454
-                    )
-                    VerticalMovieCard(
-                        selectedDestination: .movieDetail,
-                        movieId: 1232454
-                    )
-                    VerticalMovieCard(
-                        selectedDestination: .movieDetail,
-                        movieId: 1232454
-                    )
+                    ForEach(comingSoonMovies) { movie in
+                        VerticalMovieCard(
+                            selectedDestination: .movieDetail,
+                            movieId: movie.id
+                        )
+                    }
                 }
                 .padding(.horizontal, 0)
                 .padding(.vertical, 0)
@@ -138,6 +126,9 @@ struct ComingSoonSection: View {
             .padding(.leading, 0)
         }
         .background(Color.mainColor1)
+        .onAppear {
+            fetchComingSoonMovies()
+        }
     }
 
     private func calculateVisibleCategories(for totalWidth: CGFloat) {
@@ -159,8 +150,47 @@ struct ComingSoonSection: View {
             }
         }
     }
-}
 
+    private func fetchComingSoonMovies() {
+        let (startDate, endDate) = calculateDateRange(for: selectedTimeFrame)
+        TMDBService().fetchComingSoonMovies(startDate: startDate, endDate: endDate) { result in
+            switch result {
+            case .success(let movies):
+                DispatchQueue.main.async {
+                    self.comingSoonMovies = movies
+                }
+            case .failure(let error):
+                print("Failed to fetch coming soon movies: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    private func calculateDateRange(for timeFrame: String) -> (String, String) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        let currentDate = Date()
+        var endDate = currentDate
+
+        switch timeFrame {
+        case "Next 24 Hours":
+            endDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
+        case "Next 30 Days":
+            endDate = Calendar.current.date(byAdding: .day, value: 30, to: currentDate) ?? currentDate
+        case "Next 3 Months":
+            endDate = Calendar.current.date(byAdding: .month, value: 3, to: currentDate) ?? currentDate
+        case "Next 12 Months":
+            endDate = Calendar.current.date(byAdding: .year, value: 1, to: currentDate) ?? currentDate
+        default:
+            break
+        }
+        
+        let startDateString = dateFormatter.string(from: currentDate)
+        let endDateString = dateFormatter.string(from: endDate)
+        
+        return (startDateString, endDateString)
+    }
+}
 
 #Preview {
     ComingSoonSection()

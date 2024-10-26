@@ -123,7 +123,6 @@ struct ContentView: View {
         }
     }
     
-    // Popüler filmleri çağıran fonksiyon
     private func fetchPopularMovies() {
         tmdbService.fetchPopularMovies { result in
             switch result {

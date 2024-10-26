@@ -360,6 +360,41 @@ class TMDBService {
         task.resume()
     }
     
+    
+    func fetchComingSoonMovies(startDate: String, endDate: String, completion: @escaping (Result<[MovieModel], Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/discover/movie?primary_release_date.gte=\(startDate)&primary_release_date.lte=\(endDate)"
+        guard let url = URL(string: endpoint) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching coming soon movies: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for coming soon movies")
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let response = try decoder.decode(MovieResponse.self, from: data)
+                completion(.success(response.results))
+            } catch {
+                print("Error decoding coming soon movies: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+
 }
 
 struct GenreResponse: Codable {
