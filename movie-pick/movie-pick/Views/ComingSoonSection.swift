@@ -112,24 +112,24 @@ struct ComingSoonSection: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
                     VerticalMovieCard(
-                        movieTitle: "S.O.S. Bikini Bottom : Une mission pour Sandy Écureuil",
-                        moviePoster: "bikini_bottom",
-                        rating: 0,
-                        releaseYear: "2024"
+                        selectedDestination: .movieDetail,
+                        movieId: 1232454
                     )
-                    
                     VerticalMovieCard(
-                        movieTitle: "Venom: The Last Dance",
-                        moviePoster: "venom",
-                        rating: 0,
-                        releaseYear: "2024"
+                        selectedDestination: .movieDetail,
+                        movieId: 1232454
                     )
-                    
                     VerticalMovieCard(
-                        movieTitle: "Smile 2",
-                        moviePoster: "smile",
-                        rating: 0,
-                        releaseYear: "2024"
+                        selectedDestination: .movieDetail,
+                        movieId: 1232454
+                    )
+                    VerticalMovieCard(
+                        selectedDestination: .movieDetail,
+                        movieId: 1232454
+                    )
+                    VerticalMovieCard(
+                        selectedDestination: .movieDetail,
+                        movieId: 1232454
                     )
                 }
                 .padding(.horizontal, 0)

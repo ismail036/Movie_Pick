@@ -8,83 +8,80 @@
 import SwiftUI
 
 struct TrendingSection: View {
-    
     @State private var selectedTab: String = "Today"
+    @State private var trendingMovies: [MovieModel] = []
     
     var body: some View {
-        VStack(alignment: (.leading)) {
+        VStack(alignment: .leading) {
+            header
+            trendingMoviesScrollView
+        }
+        .background(Color.mainColor1)
+        .onAppear {
+            fetchTrendingMovies()
+        }
+    }
+    
+    private var header: some View {
+        HStack(alignment: .bottom) {
+            Text("Trending")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
             
-            HStack(alignment: .bottom) {
-                       Text("Trending")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                       
-                                              Button(action: {
-                           selectedTab = "Today"
-                       }) {
-                           Text("Today")
-                               .font(.system(size: 16))
-                               .fontWeight(selectedTab == "Today" ? .bold : .regular)
-                               .foregroundColor(selectedTab == "Today" ? .white : .gray)
-                       }
-                       .padding(.leading, 15)
-                       
-                       Text("|")
-                           .font(.system(size: 16))
-                           .foregroundColor(.gray)
-                       
-                       Button(action: {
-                           selectedTab = "This Week"
-                       }) {
-                           Text("This Week")
-                               .font(.system(size: 16))
-                               .fontWeight(selectedTab == "This Week" ? .bold : .regular)
-                               .foregroundColor(selectedTab == "This Week" ? .white : .gray)
-                       }
-                   }
+            Button(action: {
+                selectedTab = "Today"
+                fetchTrendingMovies()
+            }) {
+                Text("Today")
+                    .font(.system(size: 16))
+                    .fontWeight(selectedTab == "Today" ? .bold : .regular)
+                    .foregroundColor(selectedTab == "Today" ? .white : .gray)
+            }
+            .padding(.leading, 15)
             
-                
+            Text("|")
+                .font(.system(size: 16))
+                .foregroundColor(.gray)
             
-            ScrollView(.horizontal) {
-                HStack {
-                    
+            Button(action: {
+                selectedTab = "This Week"
+                fetchTrendingMovies()
+            }) {
+                Text("This Week")
+                    .font(.system(size: 16))
+                    .fontWeight(selectedTab == "This Week" ? .bold : .regular)
+                    .foregroundColor(selectedTab == "This Week" ? .white : .gray)
+            }
+        }
+    }
+    
+    private var trendingMoviesScrollView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 16) {
+                ForEach(trendingMovies) { movie in
                     VerticalMovieCard(
-                        movieTitle: "Deadpool & Wolverine",
-                        moviePoster: "deadpool_wolverine",
-                        rating: 5,
-                        releaseYear: "2024"
-                    )
-                    
-                    VerticalMovieCard(
-                        movieTitle: "Bad Boys: Ride or Die",
-                        moviePoster: "bad_boys",
-                        rating: 4,
-                        releaseYear: "2024"
-                    )
-                    
-                    VerticalMovieCard(
-                        movieTitle: "Despicable Me 4",
-                        moviePoster: "despicable",
-                        rating: 3,
-                        releaseYear: "2024"
-                    )
-                    
-                    VerticalMovieCard(
-                        movieTitle: "Deadpool & Wolverine",
-                        moviePoster: "deadpool_wolverine",
-                        rating: 5,
-                        releaseYear: "2024"
+                        selectedDestination: .movieDetail,
+                        movieId: movie.id
                     )
                 }
             }
-            
-            
         }
-        .frame(maxWidth: .infinity)
-                .background(Color.mainColor1)
     }
-
+    
+    private func fetchTrendingMovies() {
+        let timeWindow = selectedTab == "Today" ? "day" : "week"
+        TMDBService().fetchTrendingMovies(timeWindow: timeWindow) { result in
+            switch result {
+            case .success(let movies):
+                DispatchQueue.main.async {
+                    self.trendingMovies = movies
+                }
+            case .failure(let error):
+                print("Failed to fetch trending movies: \(error.localizedDescription)")
+            }
+        }
+    }
 }
 
 #Preview {

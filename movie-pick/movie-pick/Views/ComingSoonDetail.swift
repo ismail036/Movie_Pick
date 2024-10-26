@@ -29,32 +29,13 @@ struct ComingSoonDetail: View {
                         GridItem(.fixed(cardWidth), spacing: 8)
                     ], spacing: 8) {
                         ForEach(0..<5, id: \.self) { _ in
-                        VerticalMovieCard(
-                            movieTitle: "Deadpool & Wolverine",
-                            moviePoster: "deadpool_wolverine",
-                            rating: 4,
-                            releaseYear: "2024",
-                            multiplier: UIScreen.main.bounds.width < 375 ? 0.6 :
-                                UIScreen.main.bounds.width > 430 ? 0.8 : 0.7
-                        )
+                            VerticalMovieCard(
+                                selectedDestination: .movieDetail,
+                                movieId: 1232454
+                            )
 
-                        VerticalMovieCard(
-                            movieTitle: "Bad Boys: Ride or Die",
-                            moviePoster: "bad_boys",
-                            rating: 4,
-                            releaseYear: "2024",
-                            multiplier: UIScreen.main.bounds.width < 375 ? 0.6 :
-                                UIScreen.main.bounds.width > 430 ? 0.8 : 0.7
-                        )
-
-                        VerticalMovieCard(
-                            movieTitle: "Despicable Me 4",
-                            moviePoster: "despicable",
-                            rating: 4,
-                            releaseYear: "2024",
-                            multiplier: UIScreen.main.bounds.width < 375 ? 0.6 :
-                                UIScreen.main.bounds.width > 430 ? 0.8 : 0.7
-                        )
+                            
+                            
                         }
                     }
                     .padding(.horizontal)

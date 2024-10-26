@@ -37,7 +37,6 @@ struct WelcomeSection: View {
                             .frame(width: UIScreen.main.bounds.width * 0.95)
                     }
                 }
-                .padding(.horizontal)
             }
         }
         .background(Color.mainColor1)

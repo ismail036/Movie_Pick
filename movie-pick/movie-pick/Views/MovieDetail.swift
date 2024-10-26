@@ -100,7 +100,7 @@ struct MovieDetail: View {
                     }
                     
                     if selectedTab == 0 {
-                        OverviewTab(movieID: movie.id)
+                        OverviewTab(movieID: movie.id,movieModel:self.movie)
                     } else if selectedTab == 1 {
                         PhotosAndVideosTab(movieId: movie.id)
                     } else {

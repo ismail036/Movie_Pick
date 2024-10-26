@@ -30,12 +30,7 @@ struct MoreLikeThisDetail: View {
                         ForEach(filteredMovies) { movie in
                             VerticalMovieCard(
                                 selectedDestination: .movieDetail,
-                                movieTitle: movie.title,
-                                moviePoster: movie.posterURL?.absoluteString ?? "",
-                                rating: Int((movie.voteAverage ?? 0) / 2),
-                                releaseYear: String(movie.releaseDate?.prefix(4) ?? ""),
-                                multiplier: UIScreen.main.bounds.width < 375 ? 0.6 :
-                                    UIScreen.main.bounds.width > 430 ? 0.8 : 0.7
+                                movieId: 1232454
                             )
                         }
                     }

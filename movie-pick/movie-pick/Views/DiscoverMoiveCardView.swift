@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct DiscoverMovieCardView: View {
     var movieTitle: String
@@ -13,8 +14,8 @@ struct DiscoverMovieCardView: View {
     var rating: Int
     var genres: [String]
     var description: String
-    var posterImage: String
-    
+    var posterImageURL: String // Tam URL olarak poster resim URL'si
+
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .leading, spacing: 8) {
@@ -62,13 +63,13 @@ struct DiscoverMovieCardView: View {
             .background(Color.mainColor3)
             .cornerRadius(20)
             
-            Image(posterImage)
+            WebImage(url: URL(string: posterImageURL))
                 .resizable()
                 .scaledToFill()
                 .frame(width: 120, height: 180)
                 .cornerRadius(12)
         }
-        .frame(maxWidth: .infinity) 
+        .frame(maxWidth: .infinity)
         .background(Color.mainColor3)
         .cornerRadius(20)
         .padding(.leading, 0)
@@ -83,6 +84,6 @@ struct DiscoverMovieCardView: View {
         rating: 4,
         genres: ["Action", "Adventure", "Animation"],
         description: "After a family tragedy, three generations of the Deetz family return home to Winter River.",
-        posterImage: "beetlejuice"
+        posterImageURL: "https://image.tmdb.org/t/p/w500/deadpool_wolverine.jpg"
     )
 }

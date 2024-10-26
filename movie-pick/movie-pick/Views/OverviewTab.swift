@@ -11,6 +11,7 @@ struct OverviewTab: View {
     
     @State private var showFullText = false
     var movieID : Int
+    var movieModel: MovieModel
     @State private var overview: String = ""
     
     
@@ -49,7 +50,7 @@ struct OverviewTab: View {
 
             VideosSection(movieId:self.movieID)
             
-            MoreLikeThisSection(movieId: self.movieID)
+            MoreLikeThisSection(movieId: self.movieID , movieModel: self.movieModel)
             
             MovieDetailInfoCard(movieId: self.movieID)
         }
@@ -87,5 +88,26 @@ struct OverviewTab: View {
 }
 
 #Preview {
-    OverviewTab(movieID: 1184918)
+    OverviewTab(movieID: 1184918,movieModel: MovieModel(
+        id: 1184918,
+        title: "Deadpool & Wolverine",
+        originalTitle: "Deadpool & Wolverine",
+        overview: "After a shipwreck, an intelligent robot called Roz is stranded...",
+        posterPath: "/deadpool_wolverine.jpg",
+        backdropPath: "/417tYZ4XUyJrtyZXj7HpvWf1E8f.jpg",
+        releaseDate: "2024-09-12",
+        runtime: 120,
+        voteAverage: 8.6,
+        voteCount: 1514,
+        genreIds: [28, 12],
+        genres: nil,
+        popularity: 5400.8,
+        originalLanguage: "en",
+        adult: false,
+        budget: 185000000,
+        revenue: 672000000,
+        tagline: "Heroes united.",
+        homepage: "https://example.com",
+        status: "Released"
+    ))
 }

@@ -214,7 +214,152 @@ class TMDBService {
         fetchPage()
     }
     
+    
+    func fetchTrendingMovies(timeWindow: String, completion: @escaping (Result<[MovieModel], Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/trending/movie/\(timeWindow)"
+        guard let url = URL(string: endpoint) else { return }
 
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching trending movies: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for trending movies")
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let response = try decoder.decode(MovieResponse.self, from: data)
+                completion(.success(response.results))
+            } catch {
+                print("Error decoding trending movies: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+    
+    
+    
+    func fetchMovieById(movieId: Int, completion: @escaping (Result<MovieModel, Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/movie/\(movieId)"
+        guard let url = URL(string: endpoint) else {
+            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching movie by ID: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for movie by ID")
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let movie = try decoder.decode(MovieModel.self, from: data)
+                completion(.success(movie))
+            } catch {
+                print("Decoding error: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+    
+
+    
+    func fetchDiscoverMovies(completion: @escaping (Result<[MovieModel], Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/discover/movie"
+        guard let url = URL(string: endpoint) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching discover movies: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for discover movies")
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let response = try decoder.decode(MovieResponse.self, from: data)
+                let discoverMovies = Array(response.results.prefix(2)) // Sadece 2 film al
+                completion(.success(discoverMovies))
+            } catch {
+                print("Error decoding discover movies: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+    
+    func fetchAllDiscoverMovies(completion: @escaping (Result<[MovieModel], Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/discover/movie"
+        guard let url = URL(string: endpoint) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching discover movies: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for discover movies")
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let response = try decoder.decode(MovieResponse.self, from: data)
+                let discoverMovies = Array(response.results) // Sadece 2 film al
+                completion(.success(discoverMovies))
+            } catch {
+                print("Error decoding discover movies: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+    
 }
 
 struct GenreResponse: Codable {
@@ -258,3 +403,4 @@ struct AuthorDetails: Codable {
     let avatarPath: String?
     let rating: Double?
 }
+

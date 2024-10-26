@@ -9,6 +9,7 @@ import Foundation
 
 struct MovieResponse: Codable {
     let results: [MovieModel]
+    let totalPages: Int? // toplam sayfa sayısı için alan
 }
 
 struct MovieModel: Codable, Identifiable {

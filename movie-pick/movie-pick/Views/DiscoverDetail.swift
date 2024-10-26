@@ -9,18 +9,18 @@ import SwiftUI
 
 struct DiscoverDetail: View {
     @Environment(\.presentationMode) var presentationMode
-
     let genres = ["All Genres", "Action", "Adventure", "Animation", "Comedy", "Horror", "Sci-Fi"]
+    
     @State private var selectedGenres: [String] = []
+    @State private var allMovies: [MovieModel] = [] // Tüm filmler
+    @State private var filteredMovies: [MovieModel] = [] // Filtrelenmiş filmler
 
     var body: some View {
         VStack {
-            
             genreScrollView
             
             ScrollView {
                 VStack(alignment: .leading) {
-
                     let cardWidth = (UIScreen.main.bounds.width - 48) / 3
 
                     LazyVGrid(columns: [
@@ -28,37 +28,12 @@ struct DiscoverDetail: View {
                         GridItem(.fixed(cardWidth), spacing: 8),
                         GridItem(.fixed(cardWidth), spacing: 8)
                     ], spacing: 8) {
-                        ForEach(0..<5, id: \.self) { _ in
-                        VerticalMovieCard(
-                            selectedDestination:Destination.movieDetail,
-                            movieTitle: "Deadpool & Wolverine",
-                            moviePoster: "deadpool_wolverine",
-                            rating: 4,
-                            releaseYear: "2024",
-                            multiplier: UIScreen.main.bounds.width < 375 ? 0.6 :
-                                UIScreen.main.bounds.width > 430 ? 0.8 : 0.7
-                        )
-
-                        VerticalMovieCard(
-                            selectedDestination:Destination.movieDetail,
-                            movieTitle: "Bad Boys: Ride or Die",
-                            moviePoster: "bad_boys",
-                            rating: 4,
-                            releaseYear: "2024",
-                            multiplier: UIScreen.main.bounds.width < 375 ? 0.6 :
-                                UIScreen.main.bounds.width > 430 ? 0.8 : 0.7
-                        )
-
-                        VerticalMovieCard(
-                            selectedDestination:Destination.movieDetail,
-                            movieTitle: "Despicable Me 4",
-                            moviePoster: "despicable",
-
-                            rating: 4,
-                            releaseYear: "2024",
-                            multiplier: UIScreen.main.bounds.width < 375 ? 0.6 :
-                                UIScreen.main.bounds.width > 430 ? 0.8 : 0.7
-                        )
+                        ForEach(filteredMovies) { movie in
+                            VerticalMovieCard(
+                                selectedDestination: .movieDetail,
+                                movieId: movie.id,
+                                multiplier: 0.7
+                            )
                         }
                     }
                     .padding(.horizontal)
@@ -66,6 +41,9 @@ struct DiscoverDetail: View {
             }
         }
         .background(Color.mainColor1)
+        .onAppear {
+            fetchDiscoverMovies()
+        }
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -97,6 +75,7 @@ struct DiscoverDetail: View {
                     Button(action: {
                         if genre == "All Genres" {
                             selectedGenres.removeAll()
+                            filteredMovies = allMovies
                         } else {
                             if selectedGenres.contains("All Genres") {
                                 selectedGenres.removeAll { $0 == "All Genres" }
@@ -106,6 +85,7 @@ struct DiscoverDetail: View {
                             } else {
                                 selectedGenres.append(genre)
                             }
+                            applyGenreFilter()
                         }
                     }) {
                         HStack(spacing: 4) {
@@ -121,22 +101,48 @@ struct DiscoverDetail: View {
                                     .frame(width: 16, height: 16)
                                     .background(Color.white)
                                     .clipShape(Circle())
-                                    .padding(.trailing,8)
+                                    .padding(.trailing, 8)
                             }
                         }
                     }
                     .background(selectedGenres.contains(genre) ? Color.blue : Color.blue.opacity(0.3))
                     .cornerRadius(20)
-
-
                 }
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
         }
     }
+
+    private func fetchDiscoverMovies() {
+        TMDBService().fetchAllDiscoverMovies { result in
+            switch result {
+            case .success(let movies):
+                DispatchQueue.main.async {
+                    self.allMovies = movies
+                    self.filteredMovies = movies
+                    
+                    print(filteredMovies)
+                }
+            case .failure(let error):
+                print("Failed to fetch discover movies: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func applyGenreFilter() {
+        if selectedGenres.isEmpty {
+            filteredMovies = allMovies
+        } else {
+            filteredMovies = allMovies.filter { movie in
+                let movieGenres = movie.genres?.map { $0.name } ?? []
+                return !Set(selectedGenres).isDisjoint(with: movieGenres)
+            }
+        }
+    }
 }
 
 #Preview {
-        DiscoverDetail()
+    DiscoverDetail()
 }
+
