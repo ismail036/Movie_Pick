@@ -38,7 +38,7 @@ struct EpisodeDetailView: View {
             ScrollView {
                 VStack(alignment: .leading) {
                     ZStack(alignment: .leading) {
-                        Image(episodeThumbnailURL)
+                        Image("img1")
                         
                         
                         VStack(alignment: .center) {

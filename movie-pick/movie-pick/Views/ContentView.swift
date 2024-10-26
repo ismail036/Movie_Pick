@@ -12,19 +12,13 @@ struct ContentView: View {
     }
 
     var body: some View {
-        
-        TabView(selection: $selectedTab) { // TabView'de selection parametresi kullanılıyor
+        TabView(selection: $selectedTab) {
             NavigationView {
                 MovieView()
             }
             .tabItem {
                 VStack {
                     if selectedTab == 0 {
-                        Image("movieSelectedIcon")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                        Text("Movies")
-                    }else if selectedTab == 0 {
                         Image("movieSelectedIcon")
                             .resizable()
                             .frame(width: 20, height: 20)
@@ -58,6 +52,72 @@ struct ContentView: View {
                 }
             }
             .tag(1)
+            
+            
+            NavigationView {
+                SearchView()
+            }
+            .tabItem {
+                VStack {
+                    if selectedTab == 2 {
+                        Image("searchIconSelected")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                        Text("Search")
+                    } else {
+                        Image("SearchIcon")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                        Text("")
+                    }
+                }
+            }
+            .tag(2)
+            
+            
+            NavigationView {
+                LibraryView()
+            }
+            .tabItem {
+                VStack {
+                    if selectedTab == 3 {
+                        Image("libraryIconSelected")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                        Text("Library")
+                    } else {
+                        Image("libraryIcon")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                        Text("")
+                    }
+                }
+            }
+            .tag(3)
+            
+            
+            NavigationView {
+                SettingsView()
+            }
+            .tabItem {
+                VStack {
+                    if selectedTab == 4 {
+                        Image("settingsIconSelected")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                        Text("Settings")
+                    } else {
+                        Image("settingsIcon")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                        Text("")
+                    }
+                }
+            }
+            .tag(4)
+
+            
+            
         }
         .background(Color.mainColor1)
         .navigationViewStyle(StackNavigationViewStyle())
