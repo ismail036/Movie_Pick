@@ -138,7 +138,5 @@ struct DiscoverDetail: View {
 }
 
 #Preview {
-    NavigationView {
         DiscoverDetail()
-    }
 }

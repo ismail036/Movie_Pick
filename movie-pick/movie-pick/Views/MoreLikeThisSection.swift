@@ -28,7 +28,7 @@ struct MoreLikeThisSection: View {
 
                 Spacer()
 
-                NavigationLink(destination: MoreLikeThisDetail(movieId: 1184918)){
+                NavigationLink(destination: MoreLikeThisDetail(movieId: movieId)){
                     HStack {
                         Text("View More")
                         Image(systemName: "chevron.right")

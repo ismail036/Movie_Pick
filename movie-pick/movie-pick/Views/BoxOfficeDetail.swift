@@ -55,7 +55,5 @@ struct BoxOfficeDetail: View {
 }
 
 #Preview {
-    NavigationView {
         BoxOfficeDetail()
-    }
 }

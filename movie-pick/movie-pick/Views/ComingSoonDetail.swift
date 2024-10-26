@@ -134,7 +134,5 @@ struct ComingSoonDetail: View {
 }
 
 #Preview {
-    NavigationView {
         ComingSoonDetail()
-    }
 }

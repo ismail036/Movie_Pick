@@ -45,13 +45,13 @@ struct OverviewTab: View {
             }
             .padding()
             
-            CastCrewSection(movieId:1184918)
+            CastCrewSection(movieId:self.movieID)
 
-            VideosSection(movieId:1184918)
+            VideosSection(movieId:self.movieID)
             
-            MoreLikeThisSection(movieId: 1184918)
+            MoreLikeThisSection(movieId: self.movieID)
             
-            MovieDetailInfoCard(movieId: 1184918)
+            MovieDetailInfoCard(movieId: self.movieID)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.mainColor1)
