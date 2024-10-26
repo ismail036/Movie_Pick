@@ -8,52 +8,40 @@
 import SwiftUI
 
 struct PopularPeopleCard: View {
-    var posterImage: String
-    var name: String
-    var desc: String
+    let imageUrl: URL?
+    let name: String
+    let desc: String
 
-
-    
     var body: some View {
-        HStack(alignment: .top, spacing: 0) {
-            
-            Image(posterImage)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 120, height: 180)
-                .cornerRadius(12)
-            
-            VStack(alignment: .leading) {
-                
-                Text(name)
-                    .foregroundColor(.white)
-                    .padding(.vertical,2)
-                    
-                Text(desc)
-                    .foregroundColor(.white)
-                    .padding(.vertical,2)
-
-                
+        HStack(alignment: .top, spacing: 12) {
+            AsyncImage(url: imageUrl) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 70, height: 90)
+                    .cornerRadius(8)
+            } placeholder: {
+                Color.gray
+                    .frame(width: 70, height: 90)
+                    .cornerRadius(8)
             }
-            .padding()
-            .frame(maxWidth: .infinity,maxHeight: 180)
-            .background(Color.mainColor1)
-            .cornerRadius(20)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(name)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Text(desc)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .lineLimit(2)
+            }
+            Spacer()
         }
-        .frame(maxWidth: .infinity)
+        .padding(10)
         .background(Color.mainColor1)
-        .cornerRadius(20)
-        .padding(.leading, 0)
-        .padding(.trailing, 0)
-
+        .cornerRadius(10)
     }
 }
 
-#Preview {
-    PopularPeopleCard(
-        posterImage: "tom_holand",
-        name: "Tom Holland",
-        desc: "The Dark Knight : Le Chevalier noir, The Dark Knight Rises, and Dracula"
-    )
-}
 

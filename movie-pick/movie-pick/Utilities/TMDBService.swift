@@ -51,7 +51,7 @@ class TMDBService {
 
 
     func fetchMovieDetails(movieId: Int, completion: @escaping (Result<MovieDetailModel, Error>) -> Void) {
-        let endpoint = "\(TMDBAPI.baseURL)/movie/\(movieId)?append_to_response=credits,videos,similar"
+        let endpoint = "\(TMDBAPI.baseURL)/movie/\(movieId)?append_to_response=credits,videos,similar,images"
         guard let url = URL(string: endpoint) else { return }
 
         var request = URLRequest(url: url)
@@ -83,6 +83,7 @@ class TMDBService {
         }
         task.resume()
     }
+
 
     func fetchTopTwoMovies(completion: @escaping (Result<[MovieModel], Error>) -> Void) {
         let endpoint = "\(TMDBAPI.baseURL)/movie/popular"
@@ -131,4 +132,129 @@ class TMDBService {
                 }
             }
         }
+    
+    
+    func fetchGenres(completion: @escaping (Result<[Genre], Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/genre/movie/list"
+        guard let url = URL(string: endpoint) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching genres: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for genres")
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                let genreResponse = try decoder.decode(GenreResponse.self, from: data)
+                completion(.success(genreResponse.genres))
+            } catch {
+                print("Error decoding genres: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+    
+    func fetchAllMovieReviews(movieId: Int, completion: @escaping (Result<[FetchedReview], Error>) -> Void) {
+        var allReviews: [FetchedReview] = []
+        var currentPage = 1
+        
+        func fetchPage() {
+            let endpoint = "\(TMDBAPI.baseURL)/movie/\(movieId)/reviews?page=\(currentPage)"
+            guard let url = URL(string: endpoint) else { return }
+
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Error fetching reviews: \(error.localizedDescription)")
+                    completion(.failure(error))
+                    return
+                }
+
+                guard let data = data else {
+                    print("No data received for reviews")
+                    completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                    return
+                }
+
+                do {
+                    let decoder = JSONDecoder()
+                    decoder.keyDecodingStrategy = .convertFromSnakeCase
+                    let reviewResponse = try decoder.decode(ReviewResponse.self, from: data)
+                    allReviews.append(contentsOf: reviewResponse.results)
+                    
+                    if reviewResponse.results.isEmpty || currentPage >= (reviewResponse.totalPages ?? 1) {
+                        completion(.success(allReviews))
+                    } else {
+                        currentPage += 1
+                        fetchPage() // Bir sonraki sayfayı çek
+                    }
+                } catch {
+                    print("Error decoding reviews: \(error.localizedDescription)")
+                    completion(.failure(error))
+                }
+            }
+            task.resume()
+        }
+        
+        fetchPage()
+    }
+    
+
+}
+
+struct GenreResponse: Codable {
+    let genres: [Genre]
+}
+
+struct ReviewResponse: Codable {
+    let results: [FetchedReview]
+    let totalPages: Int?
+}
+
+struct FetchedReview: Codable, Identifiable {
+    let id: String
+    let author: String
+    let authorDetails: AuthorDetails
+    let content: String
+    let createdAt: String
+
+    var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        if let date = formatter.date(from: createdAt) {
+            formatter.dateStyle = .medium
+            return formatter.string(from: date)
+        }
+        return createdAt
+    }
+
+    var profileImageURL: URL? {
+        guard let path = authorDetails.avatarPath else { return nil }
+        let fixedPath = path.hasPrefix("/https") ? String(path.dropFirst()) : path
+        return URL(string: "https://image.tmdb.org/t/p/w185\(fixedPath)")
+    }
+
+    var rating: Int {
+        return Int(authorDetails.rating ?? 0)
+    }
+}
+
+struct AuthorDetails: Codable {
+    let avatarPath: String?
+    let rating: Double?
 }

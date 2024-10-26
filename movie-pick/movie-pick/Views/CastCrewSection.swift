@@ -7,22 +7,13 @@
 
 import SwiftUI
 
-struct CastMember: Identifiable {
-    let id = UUID()
-    let imageName: String
-    let actorName: String
-    let characterName: String
-}
-
 struct CastCrewSection: View {
     @State private var selectedTab: String = "Cast"
+    @State private var credits: Credits?
+    @State private var castMembers: [MovieCastMember] = []
+    @State private var crewMembers: [MovieCrewMember] = []
     
-    let castMembers = [
-        CastMember(imageName: "tom_holand", actorName: "Tom Holland", characterName: "Dr. Ilene Andre..."),
-        CastMember(imageName: "anne_hathaway", actorName: "Anne Hathaway", characterName: "Bernie Hayes..."),
-        CastMember(imageName: "jesse", actorName: "Jesse Eisenberg", characterName: "Trapper"),
-        CastMember(imageName: "tom_holand", actorName: "Tom Holland", characterName: "Dr. Ilene Andre...")
-    ]
+    let movieId: Int
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -33,7 +24,7 @@ struct CastCrewSection: View {
                     Text("Cast")
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(selectedTab == "Cast" ? .white : .gray) // Seçiliyse beyaz, değilse gri
+                        .foregroundColor(selectedTab == "Cast" ? .white : .gray)
                 }
                 
                 Text("|")
@@ -48,54 +39,104 @@ struct CastCrewSection: View {
                     Text("Crew")
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(selectedTab == "Crew" ? .white : .gray) // Seçiliyse beyaz, değilse gri
+                        .foregroundColor(selectedTab == "Crew" ? .white : .gray)
                 }
                 
                 Spacer()
                 
-                NavigationLink(destination: CastCrewDetail()){
+                NavigationLink(destination: CastCrewDetail(movieId: movieId)) {
                     HStack {
-                            Text("View More")
-                            Image(systemName: "chevron.right")
-                        }
+                        Text("View More")
+                        Image(systemName: "chevron.right")
                     }
-                    .foregroundColor(.blue)
-                    .navigationBarBackButtonHidden(true)
+                }
+                .foregroundColor(.blue)
+                .navigationBarBackButtonHidden(true)
             }
             .padding(.horizontal)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    ForEach(castMembers) { member in
-                        VStack(alignment: .center) {
-                            ZStack(alignment: .bottom) {
-                                Image(member.imageName)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 120, height: 150)
-                                    .cornerRadius(8)
-                                    .clipped()
-                                
-                                
-                                VStack(alignment: .center) {
-                                    Text(member.actorName)
-                                        .font(.headline)
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 15)
-                                        .multilineTextAlignment(.center) // Metni ortalayan ayar
-                                        .cornerRadius(4)
-                                        .padding(.bottom, 5)
+                    if selectedTab == "Cast" {
+                        ForEach(castMembers) { member in
+                            VStack(alignment: .center) {
+                                ZStack(alignment: .bottom) {
+                                    if let profileURL = member.profileURL {
+                                        AsyncImage(url: profileURL) { image in
+                                            image
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: 120, height: 150)
+                                                .cornerRadius(8)
+                                        } placeholder: {
+                                            Color.gray
+                                                .frame(width: 120, height: 150)
+                                                .cornerRadius(8)
+                                        }
+                                    } else {
+                                        Color.gray
+                                            .frame(width: 120, height: 150)
+                                            .cornerRadius(8)
+                                    }
+                                    
+                                    VStack(alignment: .center) {
+                                        Text(member.name)
+                                            .font(.headline)
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 15)
+                                            .multilineTextAlignment(.center)
+                                            .cornerRadius(4)
+                                            .padding(.bottom, 5)
+                                    }
                                 }
-
                                 
+                                Text(member.character ?? "Unknown")
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                                    .multilineTextAlignment(.center)
                             }
-                            
-                            Text(member.characterName)
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                                .multilineTextAlignment(.center)
+                            .frame(width: 120)
                         }
-                        .frame(width: 120)
+                    } else {
+                        ForEach(crewMembers) { member in
+                            VStack(alignment: .center) {
+                                ZStack(alignment: .bottom) {
+                                    if let profileURL = member.profileURL {
+                                        AsyncImage(url: profileURL) { image in
+                                            image
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: 120, height: 150)
+                                                .cornerRadius(8)
+                                        } placeholder: {
+                                            Color.gray
+                                                .frame(width: 120, height: 150)
+                                                .cornerRadius(8)
+                                        }
+                                    } else {
+                                        Color.gray
+                                            .frame(width: 120, height: 150)
+                                            .cornerRadius(8)
+                                    }
+                                    
+                                    VStack(alignment: .center) {
+                                        Text(member.name)
+                                            .font(.headline)
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 15)
+                                            .multilineTextAlignment(.center)
+                                            .cornerRadius(4)
+                                            .padding(.bottom, 5)
+                                    }
+                                }
+                                
+                                Text(member.job ?? "Unknown")
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .frame(width: 120)
+                        }
                     }
                 }
                 .padding(.horizontal)
@@ -103,9 +144,25 @@ struct CastCrewSection: View {
         }
         .background(Color.mainColor1)
         .navigationBarBackButtonHidden(true)
+        .onAppear(perform: fetchMovieDetails)
+    }
+    
+    private func fetchMovieDetails() {
+        TMDBService().fetchMovieDetails(movieId: movieId) { result in
+            switch result {
+            case .success(let movieDetail):
+                DispatchQueue.main.async {
+                    self.credits = movieDetail.credits
+                    self.castMembers = self.credits?.cast ?? []
+                    self.crewMembers = self.credits?.crew ?? []
+                }
+            case .failure(let error):
+                print("Failed to fetch movie details: \(error.localizedDescription)")
+            }
+        }
     }
 }
 
 #Preview {
-    CastCrewSection()
+    CastCrewSection(movieId: 1184918)
 }

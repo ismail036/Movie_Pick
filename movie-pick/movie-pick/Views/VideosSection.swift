@@ -7,31 +7,26 @@
 
 
 import SwiftUI
-import AVKit
+import WebKit
 
-// Video Modeli: Her bir videonun bilgilerini içerir
-struct Video: Identifiable {
-    let id = UUID()
-    let videoURL: URL // Video URL'si
-    let thumbnailURL: URL // Kapak resminin URL'si
-    let title: String // Video başlığı
-    let daysAgo: String // Video yayın tarihi bilgisi
+struct WebView: UIViewRepresentable {
+    let url: URL
+    
+    func makeUIView(context: Context) -> WKWebView {
+        return WKWebView()
+    }
+    
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        let request = URLRequest(url: url)
+        uiView.load(request)
+    }
 }
 
 struct VideosSection: View {
-    @State private var selectedVideo: Video? // Seçili video oynatıcıda gösterilecek
+    @State private var selectedVideo: MovieVideo? // Seçili video
+    @State private var videos: [MovieVideo] = [] // Videoları burada saklayacağız
     
-    let videos = [
-        Video(videoURL: URL(string: "https://www.youtube.com/watch?v=RlfooqeZcdY")!,
-              thumbnailURL: URL(string: "https://s3-alpha-sig.figma.com/img/f3ad/bfae/4cfc63a9fe738d63aeb88f08dc8ec8be?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=SafOjwuVnNNWDomkoHBKpRb3HQshFRxdPZSM6EiHE6Eub8-MG75XhZXQ0m0MFztfzMiLdtgph9dgmYqA-qqVk6PamrXbQwPGqkAdYID3sErR6doQc8TPsWGj9NbFx5g17SA7rr1Z5Mh7iQgXx2e5hoBpBZEloluuH4JzEXshJfbcqykDRvp46gQRFaFUa8yn~BcKxV1cxqlomAZ1pvkYqOiZcHKfu6Vmg3WY5SQHtnXMvfJriZH2glN26u9O4OhsDmrn-h68wM1tG4mYm-TKQr6oNe344Bd0YnsUKKaPCDOrXyg5kiDdv1BM~1zbx3ghIFiuZFQ7J3zUGWIiDueMFA__")!,
-              title: "Official Trailer (Subtitled)",
-              daysAgo: "2 days ago"),
-        
-        Video(videoURL: URL(string: "https://www.youtube.com/watch?v=RlfooqeZcdY")!,
-              thumbnailURL: URL(string: "https://s3-alpha-sig.figma.com/img/31db/39f1/09fd6f6fc8d9a78f2f8887de8e10287a?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=MpwnSpeDCrP3njKESpaAR8DbScPeG9wUinTnHDicw71kkhfPE0B4rokA9ORLnP2EY0lJ-RO3mYRW5iO9Rw3M5ud~4uz-jLrXi-U4etzwmgQquMGjHldKrm0y1B74t2Re5qJSwTjMPV~lGuhn2iiWGEJGFA5yIRK5XCqU0TF5ijZlUbZGbh8MVgZ6QgFKKPPUmWhB-hlzip0h9AozvhVFp4CjoWeXp4pgzIgDAGOLFrg~8V5A3qNj44ewnAotvd9dZ0wD7wwgqaQAl0N0rkWe07qFcnZcE0yt3zqJwc9fZgNB-ZLLctddp3NMavZF9W6hsAx8tg~p~nLaxy7sMDrHtg__")!,
-              title: "Exclusive Clip (Subtitled)",
-              daysAgo: "5 days ago")
-    ]
+    let movieId: Int
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -43,14 +38,14 @@ struct VideosSection: View {
                 
                 Spacer()
                 
-                NavigationLink(destination: VideosDetail()){
+              /*  NavigationLink(destination: VideosDetail()) {
                     HStack {
-                            Text("View More")
-                            Image(systemName: "chevron.right")
-                        }
+                        Text("View More")
+                        Image(systemName: "chevron.right")
                     }
-                    .foregroundColor(.blue)
-                    .navigationBarBackButtonHidden(true)
+                }
+                .foregroundColor(.blue)
+                .navigationBarBackButtonHidden(true) */
             }
             .padding(.horizontal)
             
@@ -59,10 +54,17 @@ struct VideosSection: View {
                     ForEach(videos) { video in
                         VStack(alignment: .leading) {
                             ZStack(alignment: .center) {
-                                ImageLoader(url: video.thumbnailURL.absoluteString)
-                                    .frame(width: 180, height: 100)
-                                    .cornerRadius(8)
-                                    .clipped()
+                                AsyncImage(url: video.thumbnailURL) { image in
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 180, height: 100)
+                                        .cornerRadius(8)
+                                } placeholder: {
+                                    Color.gray
+                                        .frame(width: 180, height: 100)
+                                        .cornerRadius(8)
+                                }
                                 
                                 Button(action: {
                                     selectedVideo = video
@@ -75,14 +77,12 @@ struct VideosSection: View {
                                 }
                             }
                             
-                            Text(video.title)
+                            Text(video.name ?? "Unknown Title")
                                 .font(.body)
                                 .foregroundColor(.white)
                                 .padding(.top, 5)
-                            
-                            Text(video.daysAgo)
-                                .font(.caption)
-                                .foregroundColor(.gray)
+                                .lineLimit(2)
+
                         }
                         .frame(width: 180)
                     }
@@ -93,55 +93,27 @@ struct VideosSection: View {
         .background(Color.black)
         .navigationBarBackButtonHidden(true)
         .sheet(item: $selectedVideo) { video in
-            AVPlayerViewControllerRepresented(player: AVPlayer(url: video.videoURL))
-        }
-    }
-}
-
-struct ImageLoader: View {
-    let url: String
-    
-    @State private var image: UIImage? = nil
-    
-    var body: some View {
-        if let image = image {
-            Image(uiImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-        } else {
-            Rectangle()
-                .foregroundColor(.gray)
-                .onAppear {
-                    loadImage(from: url)
-                }
-        }
-    }
-    
-    private func loadImage(from urlString: String) {
-        guard let url = URL(string: urlString) else { return }
-        
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data, let loadedImage = UIImage(data: data) else { return }
-            DispatchQueue.main.async {
-                self.image = loadedImage
+            if let url = video.videoURL {
+                WebView(url: url)
             }
         }
-        task.resume()
-    }
-}
-
-struct AVPlayerViewControllerRepresented: UIViewControllerRepresentable {
-    let player: AVPlayer
-    
-    func makeUIViewController(context: Context) -> AVPlayerViewController {
-        let controller = AVPlayerViewController()
-        controller.player = player
-        return controller
+        .onAppear(perform: loadVideos)
     }
     
-    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {}
+    private func loadVideos() {
+        TMDBService().fetchMovieDetails(movieId: movieId) { result in
+            switch result {
+            case .success(let movieDetail):
+                DispatchQueue.main.async {
+                    self.videos = movieDetail.videos?.results ?? []
+                }
+            case .failure(let error):
+                print("Failed to fetch videos: \(error.localizedDescription)")
+            }
+        }
+    }
 }
 
 #Preview {
-    VideosSection()
+    VideosSection(movieId: 1184918)
 }

@@ -20,6 +20,20 @@ struct MovieDetailModel: Codable, Identifiable {
     let revenue: Int?
     let status: String?
     let overview: String?
+    let images: Images?
+    
+    struct Images: Codable {
+            let posters: [ImageItem]
+            let backdrops: [ImageItem]
+        }
+    
+    struct ImageItem: Codable {
+            let filePath: String
+            
+            var url: String {
+                return "https://image.tmdb.org/t/p/w500\(filePath)"
+            }
+        }
     
     // Eklenen alanlar
     let credits: Credits?
@@ -106,23 +120,102 @@ struct MovieVideo: Codable, Identifiable {
             return nil
         }
     }
+
+    var thumbnailURL: URL? {
+        if site == "YouTube" {
+            return URL(string: "https://img.youtube.com/vi/\(key)/hqdefault.jpg")
+        } else {
+            return nil
+        }
+    }
 }
 
-// Benzer Filmler (More Like This)
+
+//
+//  SimilarMovie.swift
+//  movie-pick
+//
+//  Created by İsmail Parlak on 26.10.2024.
+//
+
+import Foundation
+
 struct SimilarMoviesResponse: Codable {
-    let results: [SimilarMovie]?
+    let results: [SimilarMovie]
 }
 
 struct SimilarMovie: Codable, Identifiable {
     let id: Int
     let title: String
+    let originalTitle: String?
+    let overview: String?
     let posterPath: String?
+    let backdropPath: String?
+    let releaseDate: String?
+    let runtime: Int?
+    let voteAverage: Double?
+    let voteCount: Int?
+    let genreIds: [Int]?
+    var genres: [String]?
+    let popularity: Double?
+    let originalLanguage: String?
+    let adult: Bool?
+    let budget: Int?
+    let revenue: Int?
+    let tagline: String?
+    let homepage: String?
+    let status: String?
+    let images: Images?
     
+    struct Images: Codable {
+            let posters: [ImageItem]
+            let backdrops: [ImageItem]
+        }
+    
+    struct ImageItem: Codable {
+            let filePath: String
+            
+            var url: String {
+                return "https://image.tmdb.org/t/p/w500\(filePath)"
+            }
+        }
+    
+    // URL'ler
     var posterURL: URL? {
         guard let path = posterPath else { return nil }
         return URL(string: "https://image.tmdb.org/t/p/w500\(path)")
     }
+    
+    var backdropURL: URL? {
+        guard let path = backdropPath else { return nil }
+        return URL(string: "https://image.tmdb.org/t/p/w780\(path)")
+    }
+    
+    // Formatlanmış Alanlar
+    var releaseYear: String {
+        return String(releaseDate?.prefix(4) ?? "N/A")
+    }
+    
+    var voteAverageFormatted: String {
+        return String(format: "%.1f", voteAverage ?? 0.0)
+    }
+    
+    var popularityFormatted: String {
+        guard let popularity = popularity else { return "N/A" }
+        return String(format: "%.1f", popularity)
+    }
+    
+    var rating: Int {
+            return Int((voteAverage ?? 0.0) / 2) // 10 üzerinden olan oylamayı 5 üzerinden ayarlama
+        }
+    
+    mutating func setGenres(from genreList: [Genre]) {
+            self.genres = genreIds?.compactMap { id in
+                genreList.first { $0.id == id }?.name
+            }
+        }
 }
+
 
 struct MovieGenre: Codable, Identifiable {
     let id: Int

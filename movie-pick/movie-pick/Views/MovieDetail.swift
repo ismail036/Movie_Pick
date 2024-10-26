@@ -104,9 +104,9 @@ struct MovieDetail: View {
                     if selectedTab == 0 {
                         OverviewTab(movieID: movie.id)
                     } else if selectedTab == 1 {
-                        PhotosAndVideosTab()
+                        PhotosAndVideosTab(movieId: movie.id)
                     } else {
-                        ReviewsTab()
+                        ReviewsTab(movieId: movie.id)
                     }
 
                     Spacer()

@@ -12,27 +12,7 @@ struct PopularPeopleDetail: View {
     
     var body: some View {
        VStack{
-            ScrollView {
-                VStack(alignment: .leading) {
-                    ForEach(0..<3) {i in
-                        PopularPeopleCard(
-                            posterImage: "tom_holand",
-                            name: "Tom Holland",
-                            desc: "The Dark Knight : Le Chevalier noir, The Dark Knight Rises, and Dracula"
-                        )
-                        PopularPeopleCard(
-                            posterImage: "margot",
-                            name: "Margot Robbie",
-                            desc: "The Dark Knight : Le Chevalier noir, The Dark Knight Rises, and Dracula"
-                        )
-                        PopularPeopleCard(
-                            posterImage: "jason",
-                            name: "Jason Statham",
-                            desc: "The Dark Knight : Le Chevalier noir, The Dark Knight Rises, and Dracula"
-                        )
-                    }
-                }
-            }
+
         }
         .background(Color.mainColor1)
         .navigationBarBackButtonHidden(true)

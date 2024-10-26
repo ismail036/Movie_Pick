@@ -24,12 +24,7 @@ struct EpisodeDetailView: View {
     """
     
     
-    let castMembers = [
-        CastMember(imageName: "tom_holand", actorName: "Tom Holland", characterName: "Dr. Ilene Andre..."),
-        CastMember(imageName: "anne_hathaway", actorName: "Anne Hathaway", characterName: "Bernie Hayes..."),
-        CastMember(imageName: "jesse", actorName: "Jesse Eisenberg", characterName: "Trapper"),
-        CastMember(imageName: "tom_holand", actorName: "Tom Holland", characterName: "Dr. Ilene Andre...")
-    ]
+
     @Environment(\.dismiss) var dismiss
     var body: some View {
         
@@ -132,39 +127,7 @@ struct EpisodeDetailView: View {
                         
                         
                         ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 16) {
-                                ForEach(castMembers) { member in
-                                    VStack(alignment: .center) {
-                                        ZStack(alignment: .bottom) {
-                                            Image(member.imageName)
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(width: 120, height: 150)
-                                                .cornerRadius(8)
-                                                .clipped()
-                                            
-                                            
-                                            VStack(alignment: .center) {
-                                                Text(member.actorName)
-                                                    .font(.headline)
-                                                    .foregroundColor(.white)
-                                                    .padding(.horizontal, 15)
-                                                    .multilineTextAlignment(.center) // Metni ortalayan ayar
-                                                    .cornerRadius(4)
-                                                    .padding(.bottom, 5)
-                                            }
-
-                                            
-                                        }
-                                        
-                                        Text(member.characterName)
-                                            .font(.subheadline)
-                                            .foregroundColor(.gray)
-                                            .multilineTextAlignment(.center)
-                                    }
-                                    .frame(width: 120)
-                                }
-                            }
+ 
                         
 
                         }

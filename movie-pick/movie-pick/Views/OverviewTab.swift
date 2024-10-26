@@ -11,10 +11,18 @@ struct OverviewTab: View {
     
     @State private var showFullText = false
     var movieID : Int
+    @State private var overview: String = ""
     
-    let description = """
-    After a mysterious leader imposes his law in a brutal system of vertical cells, a new arrival battles against a dubious food distribution method. The system is designed in such a way that the top floors receive an abundance of food, while the lower floors struggle with starvation, causing people to fight for survival. The newcomer seeks a way to disrupt this dystopian order, while grappling with his own morality and the challenges of the brutal environment.
-    """
+    
+    
+    
+    @State private var genres: [String] = []
+    @State private var voteAverage: Double = 0.0
+    @State private var voteCount: Int = 0
+    @State private var runtime: Int = 0
+    @State private var releaseDate: String = ""
+    
+
     
     var body: some View {
         ScrollView {
@@ -23,7 +31,7 @@ struct OverviewTab: View {
                     .foregroundColor(Color.white)
                     .font(.headline)
                 
-                Text(showFullText ? description : truncatedDescription() + "... ")
+                Text(showFullText ? overview : truncatedDescription() + "... ")
                     .foregroundColor(Color.gray)
                     .font(.body)
                 
@@ -37,26 +45,44 @@ struct OverviewTab: View {
             }
             .padding()
             
+            CastCrewSection(movieId:1184918)
+
+            VideosSection(movieId:1184918)
             
-            CastCrewSection()
+            MoreLikeThisSection(movieId: 1184918)
             
-            VideosSection()
-            
-            MoreLikeThisSection()
-            
-            MovieDetailInfoCard()
+            MovieDetailInfoCard(movieId: 1184918)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.mainColor1)
+        .onAppear(perform: fetchMovieDetails)
     }
     
     func truncatedDescription() -> String {
         let limit = 150 // Approximate character count to fit 3 lines
-        if description.count > limit {
-            let endIndex = description.index(description.startIndex, offsetBy: limit)
-            return String(description[..<endIndex])
+        if overview.count > limit {
+            let endIndex = overview.index(overview.startIndex, offsetBy: limit)
+            return String(overview[..<endIndex])
         }
-        return description
+        return overview
+    }
+    
+    private func fetchMovieDetails() {
+        TMDBService().fetchMovieDetails(movieId: movieID) { result in
+            switch result {
+            case .success(let movieDetail):
+                DispatchQueue.main.async {
+                    self.overview = movieDetail.overview ?? ""
+                    self.genres = movieDetail.genres?.map { $0.name } ?? []
+                    self.voteAverage = movieDetail.voteAverage ?? 0.0
+                    self.voteCount = movieDetail.voteCount ?? 0
+                    self.runtime = movieDetail.runtime ?? 0
+                    self.releaseDate = movieDetail.releaseDate ?? "N/A"
+                }
+            case .failure(let error):
+                print("Failed to fetch movie details: \(error.localizedDescription)")
+            }
+        }
     }
 }
 

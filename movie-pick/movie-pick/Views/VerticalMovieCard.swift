@@ -5,12 +5,19 @@
 //  Created by İsmail Parlak on 21.10.2024.
 //
 
+//
+//  TrendingMovieCardView.swift
+//  movie-pick
+//
+//  Created by İsmail Parlak on 21.10.2024.
+//
+
 import SwiftUI
 
 struct VerticalMovieCard: View {
     var selectedDestination: Destination = .movieDetail
     var movieTitle: String
-    var moviePoster: String
+    var moviePoster: String // Poster URL'si
     var rating: Int
     var releaseYear: String
     var multiplier: CGFloat = 0.8
@@ -24,8 +31,9 @@ struct VerticalMovieCard: View {
                     Text(movieTitle)
                         .font(.system(size: 14 * multiplier))
                         .foregroundColor(.white)
-                        .lineLimit(2)
+                        .lineLimit(1)
                         .padding(.leading, 8 * multiplier)
+                        .padding(.bottom, 1 * multiplier)
                     
                     HStack {
                         HStack(spacing: 2 * multiplier) {
@@ -48,14 +56,21 @@ struct VerticalMovieCard: View {
                 .frame(width: 165 * multiplier, height: 210 * multiplier)
                 .background(Color.mainColor3)
                 .cornerRadius(12 * multiplier)
-                .offset(y: 40 * multiplier)
+                .offset(y: 10 * multiplier)
                 
-                Image(moviePoster)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 220 * multiplier)
-                    .cornerRadius(12 * multiplier)
-                    .offset(y: -45 * multiplier)
+                AsyncImage(url: URL(string: moviePoster)) { image in
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 220 * multiplier)
+                        .cornerRadius(12 * multiplier)
+                        .offset(y: -45 * multiplier)
+                } placeholder: {
+                    Color.gray
+                        .frame(height: 220 * multiplier)
+                        .cornerRadius(12 * multiplier)
+                        .offset(y: -50 * multiplier)
+                }
             }
             .frame(width: 170 * multiplier, height: 310 * multiplier)
             .cornerRadius(12)
@@ -87,9 +102,8 @@ enum Destination {
     VerticalMovieCard(
         selectedDestination: .movieDetail,
         movieTitle: "Deadpool & Wolverine",
-        moviePoster: "deadpool_wolverine",
+        moviePoster: "https://image.tmdb.org/t/p/w500/deadpool_wolverine.jpg",
         rating: 4,
         releaseYear: "2024"
     )
 }
-

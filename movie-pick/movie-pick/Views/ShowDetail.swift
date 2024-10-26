@@ -94,9 +94,9 @@ struct ShowDetail: View {
                     } else if selectedTab == 1 {
                         SeasonsTab()
                     }else if selectedTab == 2 {
-                        PhotosAndVideosTab()
+                        PhotosAndVideosTab(movieId: 1184918)
                     }  else {
-                        ReviewsTab()
+                        ReviewsTab(movieId: 1184918)
                     }
 
                     Spacer()
