@@ -497,6 +497,43 @@ class TMDBService {
         task.resume()
     }
 
+    
+    func fetchStreamingProviders(movieId: Int, completion: @escaping (Result<[ProviderModel], Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/movie/\(movieId)/watch/providers"
+        guard let url = URL(string: endpoint) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching streaming providers: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for streaming providers")
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                let response = try decoder.decode(ProviderResponse.self, from: data)
+                completion(.success(response.results))
+            } catch {
+                print("Error decoding streaming providers: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+
+
+    
+    
 }
 
 struct GenreResponse: Codable {
@@ -552,6 +589,22 @@ struct PersonModel: Codable, Identifiable {
     
     var profileURL: URL? {
         guard let path = profilePath else { return nil }
+        return URL(string: "https://image.tmdb.org/t/p/w200\(path)")
+    }
+}
+
+
+struct ProviderResponse: Codable {
+    let results: [ProviderModel]
+}
+
+struct ProviderModel: Codable, Identifiable {
+    let id: Int
+    let providerName: String
+    let logoPath: String?
+
+    var logoURL: URL? {
+        guard let path = logoPath else { return nil }
         return URL(string: "https://image.tmdb.org/t/p/w200\(path)")
     }
 }

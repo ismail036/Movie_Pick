@@ -8,62 +8,58 @@
 import SwiftUI
 
 struct PeopleSection: View {
-    var text:String
-    
+    var text: String
+    @State private var people: [PersonModel] = []
+    private let tmdbService = TMDBService()
+
     var body: some View {
         VStack(alignment: .leading) {
-            HStack{
+            HStack {
                 Text(text)
-                    .font(.title) // Reduced font size
+                    .font(.title)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                 
                 Spacer()
                 
                 NavigationLink(destination: PopularPeopleDetail()) {
-                        Text("View More")
-                            .foregroundColor(.blue)
+                    Text("View More")
+                        .foregroundColor(.blue)
                 }
                 .simultaneousGesture(TapGesture().onEnded {
-                    print("NavigationLink to DiscoverDetail was tapped")
+                    print("NavigationLink to PopularPeopleDetail was tapped")
                 })
-
             }
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    VerticalPeopleCardView(
-                        name: "Tom Holland",
-                        peopleCard: "tom_holand",
-                        scale: 1
-                    )
-                    
-                    VerticalPeopleCardView(
-                        name: "Jason Statham",
-                        peopleCard: "jason",
-                        scale: 1
-                    )
-                    
-                    VerticalPeopleCardView(
-                        name: "Margot Robbie",
-                        peopleCard: "margot",
-                        scale: 1
-                    )
-
+                    ForEach(people) { person in
+                        VerticalPeopleCardView(
+                            name: person.name,
+                            peopleCard: person.profileURL?.absoluteString ?? "",
+                            scale: 0.7
+                        )
+                    }
                 }
                 .padding(.horizontal, 0)
                 .padding(.vertical, 0)
             }
             .padding(.leading, 0)
-
-            
-
-            
-                    }
+        }
         .background(Color.black.edgesIgnoringSafeArea(.all))
+        .onAppear {
+            tmdbService.fetchPopularPeople { result in
+                switch result {
+                case .success(let people):
+                    self.people = people
+                case .failure(let error):
+                    print("Error fetching popular people: \(error)")
+                }
+            }
+        }
     }
 }
 
 #Preview {
-    PeopleSection(text:"Popular People")
+    PeopleSection(text: "Popular People")
 }
