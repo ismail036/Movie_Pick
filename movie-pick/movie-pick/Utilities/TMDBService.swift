@@ -497,7 +497,6 @@ class TMDBService {
         task.resume()
     }
 
-    
     func fetchStreamingProviders(movieId: Int, completion: @escaping (Result<[ProviderModel], Error>) -> Void) {
         let endpoint = "\(TMDBAPI.baseURL)/movie/\(movieId)/watch/providers"
         guard let url = URL(string: endpoint) else { return }
@@ -518,11 +517,30 @@ class TMDBService {
                 completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
                 return
             }
+            
+            print("Raw JSON data: \(String(data: data, encoding: .utf8) ?? "No data")")
 
             do {
                 let decoder = JSONDecoder()
                 let response = try decoder.decode(ProviderResponse.self, from: data)
-                completion(.success(response.results))
+                
+                // Sağlayıcıları "US" ülke kodu ile alıp `flatrate`, `buy`, `rent` seçeneklerini kontrol ediyoruz
+                if let usProviders = response.results["US"] {
+                    if let flatrate = usProviders.flatrate {
+                        completion(.success(flatrate))
+                    } else if let buy = usProviders.buy {
+                        completion(.success(buy))
+                    } else if let rent = usProviders.rent {
+                        completion(.success(rent))
+                    } else {
+                        print("No providers found for US under flatrate, buy, or rent")
+                        completion(.success([]))
+                    }
+                } else {
+                    print("No providers found for US")
+                    completion(.success([]))
+                }
+                
             } catch {
                 print("Error decoding streaming providers: \(error.localizedDescription)")
                 completion(.failure(error))
@@ -531,8 +549,48 @@ class TMDBService {
         task.resume()
     }
 
+    func fetchMoviesByProvider(providerId: Int, completion: @escaping (Result<[MovieModel], Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/discover/movie"
+        guard var urlComponents = URLComponents(string: endpoint) else { return }
 
-    
+        urlComponents.queryItems = [
+            URLQueryItem(name: "with_watch_providers", value: "\(providerId)"),
+            URLQueryItem(name: "watch_region", value: "US"), // ABD bölgesi
+            URLQueryItem(name: "api_key", value: TMDBAPI.apiKey)
+        ]
+        
+        guard let url = urlComponents.url else { return }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching movies by provider: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for movies by provider")
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let response = try decoder.decode(MovieResponse.self, from: data)
+                completion(.success(response.results))
+            } catch {
+                print("Error decoding movies by provider: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+
     
 }
 
@@ -595,7 +653,13 @@ struct PersonModel: Codable, Identifiable {
 
 
 struct ProviderResponse: Codable {
-    let results: [ProviderModel]
+    let results: [String: CountryProviders]
+}
+
+struct CountryProviders: Codable {
+    let flatrate: [ProviderModel]?
+    let buy: [ProviderModel]?
+    let rent: [ProviderModel]?
 }
 
 struct ProviderModel: Codable, Identifiable {
