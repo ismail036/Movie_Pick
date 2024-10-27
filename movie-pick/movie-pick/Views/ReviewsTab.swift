@@ -85,12 +85,8 @@ struct ReviewCard: View {
                 }
                 Spacer()
 
-                HStack(spacing: 2) {
-                    ForEach(0..<review.rating, id: \.self) { _ in
-                        Image(systemName: "star.fill")
-                            .foregroundColor(.yellow)
-                    }
-                }
+
+                
             }
 
             Text(expandedReviewId == review.id ? review.reviewText : truncatedText(review.reviewText))

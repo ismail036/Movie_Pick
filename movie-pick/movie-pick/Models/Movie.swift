@@ -33,7 +33,8 @@ struct MovieModel: Codable, Identifiable {
     let tagline: String?
     let homepage: String?
     let status: String?
-    
+    let weekendGross: Int = 0
+
     var posterURL: URL? {
         guard let path = posterPath else { return nil }
         return URL(string: "https://image.tmdb.org/t/p/w500\(path)")

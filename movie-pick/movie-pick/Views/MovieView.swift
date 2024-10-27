@@ -43,7 +43,7 @@ struct MovieView: View {
                     Spacer().frame(height: 50)
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 8)
                 .padding(.vertical, 16)
             }
         }

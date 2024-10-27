@@ -624,6 +624,112 @@ class TMDBService {
         }
         task.resume()
     }
+    
+    func fetchAiringTodayShows(completion: @escaping (Result<[TVShowModel], Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/tv/airing_today"
+        guard let url = URL(string: endpoint) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching airing today shows: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for airing today shows")
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let response = try decoder.decode(TVShowResponse.self, from: data)
+                completion(.success(response.results))
+            } catch {
+                print("Error decoding airing today shows: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+
+    // Belirli bir dizinin ayrıntılarını çekme fonksiyonu
+    func fetchTVShowDetails(showId: Int, completion: @escaping (Result<TVShowDetailModel, Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/tv/\(showId)"
+        guard let url = URL(string: endpoint) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching TV show details: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for TV show details")
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let showDetails = try decoder.decode(TVShowDetailModel.self, from: data)
+                completion(.success(showDetails))
+            } catch {
+                print("Error decoding TV show details: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+    
+    
+    func fetchShowById(showId: Int, completion: @escaping (Result<TVShowModel, Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/tv/\(showId)"
+        guard let url = URL(string: endpoint) else {
+            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching show by ID: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for show by ID")
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let show = try decoder.decode(TVShowModel.self, from: data)
+                completion(.success(show))
+            } catch {
+                print("Decoding error: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+
 }
 
 struct GenreResponse: Codable {

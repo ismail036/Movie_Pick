@@ -77,7 +77,7 @@ struct MovieDetail: View {
                 .frame(width: 0, height: 35)
 
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: 5) {
                     // Movie Detail Info Section
                     MovieDetailInfoSection(movie: self.movie) // Movie detayları burada gösteriliyor
 
@@ -103,8 +103,9 @@ struct MovieDetail: View {
                         OverviewTab(movieID: movie.id,movieModel:self.movie)
                     } else if selectedTab == 1 {
                         PhotosAndVideosTab(movieId: movie.id)
-                    } else {
+                    } else if selectedTab == 2 {
                         ReviewsTab(movieId: movie.id)
+                            .navigationBarBackButtonHidden(true)
                     }
 
                     Spacer()

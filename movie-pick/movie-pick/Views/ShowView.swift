@@ -36,41 +36,8 @@ struct ShowView: View {
                     Spacer().frame(height: 16)
 
                     
-                    VStack(alignment: .leading) {
-                        Text("Airing Today")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                        
-                        Text("October 14, 2024, Watch the newest episodes")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
 
-                        
-                        ScrollView(.horizontal) {
-                            HStack {
-                                VerticalMovieCard(
-                                    selectedDestination: .movieDetail,
-                                    movieId: 1232454
-                                )
-                                VerticalMovieCard(
-                                    selectedDestination: .movieDetail,
-                                    movieId: 1232454
-                                )
-                                VerticalMovieCard(
-                                    selectedDestination: .movieDetail,
-                                    movieId: 1232454
-                                )
-                                VerticalMovieCard(
-                                    selectedDestination: .movieDetail,
-                                    movieId: 1232454
-                                )
-    
-                            }
-                        }
-                    }
-                    .background(Color.black)
-                
+                    AiringTodaySection()
                     
                     Spacer().frame(height: 16)
 

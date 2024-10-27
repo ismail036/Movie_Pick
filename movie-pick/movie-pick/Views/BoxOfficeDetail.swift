@@ -7,7 +7,21 @@
 
 import SwiftUI
 
-import SwiftUI
+func formatCurrencyInMillions(_ value: Double) -> String {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .currency
+    formatter.currencyCode = "USD"
+    formatter.maximumFractionDigits = 0
+    
+    // Milyon formatı (1,000,000 = 1M)
+    if value >= 1_000_000 {
+        let millionValue = value / 1_000_000
+        return (formatter.string(from: NSNumber(value: millionValue)) ?? "$0") + "M"
+    } else {
+        return formatter.string(from: NSNumber(value: value)) ?? "$0"
+    }
+}
+
 
 struct BoxOfficeDetail: View {
     @Environment(\.presentationMode) var presentationMode
@@ -22,9 +36,9 @@ struct BoxOfficeDetail: View {
                         BoxOfficeMovieCard(
                             posterImage: movie.posterURL?.absoluteString ?? "",
                             movieTitle: movie.title,
-                            totalGross: "$\(movie.revenue ?? 0)",
-                            weekendGross: "$\(movie.popularity ?? 0)", // hafta içi hasılat olarak popularity kullanıyoruz
-                            week: movie.weeksInTheater ?? 1 
+                            totalGross: formatCurrencyInMillions(Double(movie.revenue ?? 0)),
+                            weekendGross: formatCurrencyInMillions(Double(movie.weekendGross ?? 0)), // weekendGross formatlama
+                            week: movie.weeksInTheater ?? 1
                         )
                     }
                 }

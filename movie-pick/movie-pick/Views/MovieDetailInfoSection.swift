@@ -64,13 +64,13 @@ struct MovieDetailInfoSection: View {
                         .padding(.bottom, 2)
                     
                     HStack {
-                        ForEach(genres, id: \.self) { genre in
+                        ForEach(genres.prefix(3), id: \.self) { genre in
                             Text(genre)
                                 .foregroundStyle(Color.cyan)
                                 .font(.caption)
                                 .bold()
                             
-                            if genre != genres.last {
+                            if genre != genres.prefix(3).last {
                                 Text("•")
                                     .foregroundStyle(Color.cyan)
                                     .font(.caption)
@@ -202,7 +202,7 @@ struct MovieDetailInfoSection: View {
                 .padding(.horizontal, 14)
                 .frame(width: geometry.size.width)
             }
-            .frame(height: 60)
+            .frame(height: 40)
             .onAppear {
                         fetchMovieDetails()
                     }
