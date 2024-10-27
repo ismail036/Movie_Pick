@@ -5,6 +5,13 @@
 //  Created by İsmail Parlak on 23.10.2024.
 //
 
+//
+//  MoreLikeThisDetail.swift
+//  movie-pick
+//
+//  Created by İsmail Parlak on 23.10.2024.
+//
+
 import SwiftUI
 
 struct MoreLikeThisDetail: View {
@@ -12,6 +19,7 @@ struct MoreLikeThisDetail: View {
     @State private var similarMovies: [SimilarMovie] = []
     @State private var selectedGenres: [String] = []
     @State private var genres: [Genre] = []
+    @State private var filteredMovies: [SimilarMovie] = [] // filteredMovies'i @State olarak tanımladık
     
     let movieId: Int
     
@@ -30,7 +38,8 @@ struct MoreLikeThisDetail: View {
                         ForEach(filteredMovies) { movie in
                             VerticalMovieCard(
                                 selectedDestination: .movieDetail,
-                                movieId: 1232454
+                                movieId: movie.id,
+                                multiplier: 0.7
                             )
                         }
                     }
@@ -72,6 +81,7 @@ struct MoreLikeThisDetail: View {
             HStack(spacing: 10) {
                 Button(action: {
                     selectedGenres = ["All Genres"]
+                    applyGenreFilter()
                 }) {
                     genreButtonContent("All Genres", isSelected: selectedGenres.contains("All Genres"))
                 }
@@ -79,6 +89,7 @@ struct MoreLikeThisDetail: View {
                 ForEach(genres, id: \.id) { genre in
                     Button(action: {
                         toggleGenreSelection(genre.name)
+                        applyGenreFilter()
                     }) {
                         genreButtonContent(genre.name, isSelected: selectedGenres.contains(genre.name))
                     }
@@ -114,7 +125,7 @@ struct MoreLikeThisDetail: View {
     
     private func toggleGenreSelection(_ genre: String) {
         if genre == "All Genres" {
-            selectedGenres = selectedGenres.contains("All Genres") ? [] : ["All Genres"]
+            selectedGenres = ["All Genres"]
         } else {
             if selectedGenres.contains("All Genres") {
                 selectedGenres.removeAll { $0 == "All Genres" }
@@ -146,11 +157,7 @@ struct MoreLikeThisDetail: View {
             case .success(let movieDetail):
                 DispatchQueue.main.async {
                     self.similarMovies = movieDetail.similar?.results ?? []
-                    self.similarMovies = self.similarMovies.map { movie in
-                        var updatedMovie = movie
-                        updatedMovie.setGenres(from: genres)
-                        return updatedMovie
-                    }
+                    self.setGenresForSimilarMovies()
                 }
             case .failure(let error):
                 print("Failed to fetch similar movies: \(error.localizedDescription)")
@@ -158,14 +165,31 @@ struct MoreLikeThisDetail: View {
         }
     }
     
-    private var filteredMovies: [SimilarMovie] {
+    private func setGenresForSimilarMovies() {
+        TMDBService().fetchGenres { result in
+            switch result {
+            case .success(let genreList):
+                DispatchQueue.main.async {
+                    for index in similarMovies.indices {
+                        similarMovies[index].setGenres(from: genreList)
+                    }
+                    self.applyGenreFilter() // Filtreyi ayarla
+                }
+            case .failure(let error):
+                print("Error setting genres for similar movies: \(error)")
+            }
+        }
+    }
+    
+    private func applyGenreFilter() {
         if selectedGenres.isEmpty || selectedGenres.contains("All Genres") {
-            return similarMovies
+            filteredMovies = similarMovies
         } else {
-            return similarMovies.filter { movie in
+            filteredMovies = similarMovies.filter { movie in
                 guard let movieGenres = movie.genres else { return false }
                 return !Set(selectedGenres).isDisjoint(with: movieGenres)
             }
+
         }
     }
 }

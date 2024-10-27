@@ -10,11 +10,11 @@ import SwiftUI
 struct VerticalShowCard: View {
     var selectedDestination: Destination = .showDetail
     var showId: Int
-    @State private var showDetail: TVShowModel? // Dizi detayı için state
+    @State private var showDetail: TVShowModel?
     var multiplier: CGFloat = 0.8
 
     var body: some View {
-        NavigationLink(destination: destinationView) {
+        NavigationLink(destination: ShowDetail(showId: showId)) {
             ZStack(alignment: .bottom) {
                 VStack(alignment: .leading) {
                     Spacer()
@@ -73,15 +73,6 @@ struct VerticalShowCard: View {
         .navigationBarBackButtonHidden(true)
     }
 
-    @ViewBuilder
-    private var destinationView: some View {
-        if let show = showDetail {
-
-        } else {
-            Text("Loading...")
-        }
-    }
-
     private func fetchShowDetail() {
         TMDBService().fetchShowById(showId: showId) { result in
             switch result {
@@ -99,6 +90,6 @@ struct VerticalShowCard: View {
 #Preview {
     VerticalShowCard(
         selectedDestination: .showDetail,
-        showId: 1412
+        showId: 1396
     )
 }

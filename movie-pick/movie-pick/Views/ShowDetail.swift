@@ -8,68 +8,92 @@
 import SwiftUI
 
 struct ShowDetail: View {
+    var showId: Int
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedTab = 0
     @State private var isSticky = false
+    @State private var showDetail: TVShowDetailModel?
     let stickyThreshold = UIScreen.main.bounds.height * 0.35
 
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                // Background Image from URL
-                AsyncImage(url: URL(string: "https://s3-alpha-sig.figma.com/img/6f95/8357/949e996437e93aed145c0a1d23b87f3b?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=FfkKv4wFvrtHllImfMUrVl-EhD3WI8bfsHzYEyyS9WWRl~k0DA6Grp77Y47CBsmErN1OIdAq1Pttt3D7ZzCq0stpRqdHTz3buPZ-IVrlUFITwjXo~w50qpQtwUkKk4t~AU9Ot0KF3gIrEw5kniPK7b81NcFVap2Qnyg0os00tsJQxgHoFpLEaoGQe7B-XBpn2ET8E28BbwJLIy5nyJwWLl~Wf2B2jOqG0zH7PkJL5381th4Ovz5v~Qk9EAz6TUVR-rEbQdcAlryNJED4z0BE~I1IvAt2tzYEBPrx2nxeizgkBuB1-k3Mguo-WqMWusyT~mY25LfDZmblaqol-TOGAg__")) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: UIScreen.main.bounds.height * 0.25)
-                        .clipped()
-                        .edgesIgnoringSafeArea(.top)
-                } placeholder: {
+                if let show = showDetail {
+                    AsyncImage(url: show.backdropURL) { phase in
+                        switch phase {
+                        case .empty:
+                            Color.gray
+                                .frame(height: UIScreen.main.bounds.height * 0.25)
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(height: UIScreen.main.bounds.height * 0.25)
+                                .clipped()
+                                .edgesIgnoringSafeArea(.top)
+                        case .failure:
+                            Color.red
+                                .frame(height: UIScreen.main.bounds.height * 0.25)
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+                } else {
                     Color.gray
-                        .frame(height: UIScreen.main.bounds.height * 0.25) // Placeholder
+                        .frame(height: UIScreen.main.bounds.height * 0.25)
                 }
 
                 VStack {
                     Spacer()
-
                     HStack(alignment: .center) {
-                        // Poster Image from URL
-                        Image("img1")
-                                .resizable()
-                                .frame(width: 120, height: 180)
-                                .cornerRadius(10)
-                                .shadow(radius: 10)
-                                .offset(y: 40)
-                                .padding(.horizontal, 16)
-                        
+                        if let show = showDetail {
+                            AsyncImage(url: show.posterURL) { phase in
+                                switch phase {
+                                case .empty:
+                                    Color.gray
+                                        .frame(width: 120, height: 180)
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .frame(width: 120, height: 180)
+                                        .cornerRadius(10)
+                                        .shadow(radius: 10)
+                                        .offset(y: 40)
+                                        .padding(.horizontal, 16)
+                                case .failure:
+                                    Color.red
+                                        .frame(width: 120, height: 180)
+                                @unknown default:
+                                    EmptyView()
+                                }
+                            }
+                        }
 
                         Spacer()
 
-                        // Button Icon Image from URL
                         Button(action: {}) {
-                                                    Image("movie_icon")
-                                                        .resizable()
-                                                        .frame(width: 60, height: 60)
-                                                        .shadow(radius: 5)
-                                                }
-                                                .offset(y: 50)
-                                                .padding(.horizontal, 16)
+                            Image("movie_icon")
+                                .resizable()
+                                .frame(width: 60, height: 60)
+                                .shadow(radius: 5)
+                        }
+                        .offset(y: 50)
+                        .padding(.horizontal, 16)
                     }
                 }
                 .padding(.bottom, 10)
             }
             .frame(height: UIScreen.main.bounds.height * 0.30)
 
-
+            ShowDetailInfoSection(showId: self.showId)
+            
             Rectangle()
-                .frame(width: 0, height: 35)
+                .frame(width: 0, height: 10)
 
             ScrollView {
                 VStack(spacing: 20) {
-                    // Movie Detail Info Section
-                    MovieDetailInfoSection(movie: MovieModel(
-                        id: 1184918, title: "The Wild Robot", originalTitle: Optional("The Wild Robot"), overview: "After a shipwreck, an intelligent robot called Roz is stranded on an uninhabited island. To survive the harsh environment, Roz bonds with the island\'s animals and cares for an orphaned baby goose.", posterPath: Optional("/wTnV3PCVW5O92JMrFvvrRcV39RU.jpg"), backdropPath: Optional("/417tYZ4XUyJrtyZXj7HpvWf1E8f.jpg"), releaseDate: Optional("2024-09-12"), runtime: nil, voteAverage: Optional(8.641), voteCount: Optional(1514), genreIds: Optional([16, 878, 10751]), genres: nil, popularity: Optional(5400.805), originalLanguage: Optional("en"), adult: Optional(false), budget: nil, revenue: nil, tagline: nil, homepage: nil, status: nil
-                    ))
+                    if let show = showDetail {
+                    }
 
                     GeometryReader { geo in
                         let offset = geo.frame(in: .global).minY
@@ -82,42 +106,21 @@ struct ShowDetail: View {
                             }
                     }
                     .frame(height: 0)
-                    
+
                     if !isSticky {
                         ShowTabButtonsView(selectedTab: $selectedTab)
                             .frame(maxWidth: .infinity)
                             .background(Color.mainColor1)
                     }
-                    
+
                     if selectedTab == 0 {
-                        OverviewTab(movieID: 1184918,movieModel: MovieModel(
-                            id: 1184918,
-                            title: "Deadpool & Wolverine",
-                            originalTitle: "Deadpool & Wolverine",
-                            overview: "After a shipwreck, an intelligent robot called Roz is stranded...",
-                            posterPath: "/deadpool_wolverine.jpg",
-                            backdropPath: "/417tYZ4XUyJrtyZXj7HpvWf1E8f.jpg",
-                            releaseDate: "2024-09-12",
-                            runtime: 120,
-                            voteAverage: 8.6,
-                            voteCount: 1514,
-                            genreIds: [28, 12],
-                            genres: nil,
-                            popularity: 5400.8,
-                            originalLanguage: "en",
-                            adult: false,
-                            budget: 185000000,
-                            revenue: 672000000,
-                            tagline: "Heroes united.",
-                            homepage: "https://example.com",
-                            status: "Released"
-                        ))
+                        ShowOverviewTab(showId: self.showId)
                     } else if selectedTab == 1 {
                         SeasonsTab()
-                    }else if selectedTab == 2 {
-                        PhotosAndVideosTab(movieId: 1184918)
-                    }  else {
-                        ReviewsTab(movieId: 1184918)
+                    } else if selectedTab == 2 {
+                        PhotosAndVideosTab(movieId: showId)
+                    } else {
+                        ReviewsTab(movieId: showId)
                     }
 
                     Spacer()
@@ -156,8 +159,26 @@ struct ShowDetail: View {
         .edgesIgnoringSafeArea(.top)
         .background(Color.mainColor1)
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            fetchShowDetail()
+        }
+    }
+
+    private func fetchShowDetail() {
+        TMDBService().fetchTVShowDetails(showId: showId) { result in
+            switch result {
+            case .success(let show):
+                DispatchQueue.main.async {
+                    self.showDetail = show
+                }
+            case .failure(let error):
+                print("Dizi detayı getirilemedi: \(error.localizedDescription)")
+            }
+        }
     }
 }
+
+
 
 
 struct ShowTabButtonsView: View {
@@ -372,5 +393,5 @@ struct Season: Identifiable {
 
 
 #Preview {
-    ShowDetail()
+    ShowDetail(showId: 1396)
 }

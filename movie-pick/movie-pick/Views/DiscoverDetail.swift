@@ -12,9 +12,9 @@ struct DiscoverDetail: View {
     let genres = ["All Genres", "Action", "Adventure", "Animation", "Comedy", "Horror", "Sci-Fi"]
     
     @State private var selectedGenres: [String] = []
-    @State private var allMovies: [MovieModel] = [] // Tüm filmler
-    @State private var filteredMovies: [MovieModel] = [] // Filtrelenmiş filmler
-
+    @State private var allMovies: [MovieModel] = []
+    @State private var filteredMovies: [MovieModel] = []
+    
     var body: some View {
         VStack {
             genreScrollView
@@ -121,8 +121,7 @@ struct DiscoverDetail: View {
                 DispatchQueue.main.async {
                     self.allMovies = movies
                     self.filteredMovies = movies
-                    
-                    print(filteredMovies)
+                    self.setGenresForMovies()
                 }
             case .failure(let error):
                 print("Failed to fetch discover movies: \(error.localizedDescription)")
@@ -131,7 +130,7 @@ struct DiscoverDetail: View {
     }
 
     private func applyGenreFilter() {
-        if selectedGenres.isEmpty {
+        if selectedGenres.isEmpty || selectedGenres.contains("All Genres") {
             filteredMovies = allMovies
         } else {
             filteredMovies = allMovies.filter { movie in
@@ -140,9 +139,34 @@ struct DiscoverDetail: View {
             }
         }
     }
+    
+    private func setGenresForMovies() {
+        TMDBService().fetchGenres { result in
+            switch result {
+            case .success(let genreList):
+                DispatchQueue.main.async {
+                    for index in allMovies.indices {
+                        allMovies[index].setGenres(from: genreList)
+                    }
+                }
+            case .failure(let error):
+                print("Error setting genres for movies: \(error)")
+            }
+        }
+    }
+
 }
+
+extension MovieModel {
+    mutating func setGenres(from genreList: [Genre]) {
+        self.genres = genreIds?.compactMap { genreId in
+            genreList.first { $0.id == genreId }
+        }
+    }
+}
+
+
 
 #Preview {
     DiscoverDetail()
 }
-

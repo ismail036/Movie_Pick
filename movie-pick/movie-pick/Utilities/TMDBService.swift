@@ -658,7 +658,8 @@ class TMDBService {
         task.resume()
     }
 
-    // Belirli bir dizinin ayrıntılarını çekme fonksiyonu
+
+
     func fetchTVShowDetails(showId: Int, completion: @escaping (Result<TVShowDetailModel, Error>) -> Void) {
         let endpoint = "\(TMDBAPI.baseURL)/tv/\(showId)"
         guard let url = URL(string: endpoint) else { return }
@@ -683,6 +684,7 @@ class TMDBService {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
                 let showDetails = try decoder.decode(TVShowDetailModel.self, from: data)
+                print("Fetched episodeRunTime:", showDetails.episodeRunTime ?? "No episode runtime found")
                 completion(.success(showDetails))
             } catch {
                 print("Error decoding TV show details: \(error.localizedDescription)")
@@ -691,6 +693,8 @@ class TMDBService {
         }
         task.resume()
     }
+
+    
     
     
     func fetchShowById(showId: Int, completion: @escaping (Result<TVShowModel, Error>) -> Void) {

@@ -18,6 +18,8 @@ struct TVShowDetailModel: Codable, Identifiable {
     let originalLanguage: String?
     let overview: String?
     let images: Images?
+    let posterPath: String?
+    let backdropPath: String?
     
     struct Images: Codable {
         let posters: [ImageItem]
@@ -46,6 +48,27 @@ struct TVShowDetailModel: Codable, Identifiable {
     
     var voteAverageFormatted: String {
         return String(format: "%.1f", voteAverage ?? 0.0)
+    }
+    
+    // Poster ve Backdrop URL'leri
+    var posterURL: URL? {
+        guard let path = posterPath else { return nil }
+        return URL(string: "https://image.tmdb.org/t/p/w500\(path)")
+    }
+    
+    var backdropURL: URL? {
+        guard let path = backdropPath else { return nil }
+        return URL(string: "https://image.tmdb.org/t/p/w780\(path)")
+    }
+    
+    // Oy sayısını beş yıldız üzerinden ayarlama
+    var rating: Int {
+        return Int((voteAverage ?? 0.0) / 2)
+    }
+    
+    // Dizinin türlerini formatlama
+    var genreNames: String {
+        return genres?.compactMap { $0.name }.joined(separator: ", ") ?? "N/A"
     }
 }
 

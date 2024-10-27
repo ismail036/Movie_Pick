@@ -50,7 +50,7 @@ struct OverviewTab: View {
 
             VideosSection(movieId:self.movieID)
             
-            MoreLikeThisSection(movieId: self.movieID , movieModel: self.movieModel)
+            MoreLikeThisSection(movieId: self.movieID)
             
             MovieDetailInfoCard(movieId: self.movieID)
         }
