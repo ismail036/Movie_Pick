@@ -591,7 +591,39 @@ class TMDBService {
         task.resume()
     }
 
-    
+    func fetchNowPlayingMovies(completion: @escaping (Result<[MovieModel], Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/movie/now_playing"
+        guard let url = URL(string: endpoint) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching now playing movies: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for now playing movies")
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let response = try decoder.decode(MovieResponse.self, from: data)
+                completion(.success(response.results))
+            } catch {
+                print("Error decoding now playing movies: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
 }
 
 struct GenreResponse: Codable {

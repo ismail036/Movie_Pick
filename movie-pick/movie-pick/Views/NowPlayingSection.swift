@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct NowPlayingSection: View {
+    var title1: String
+    var title2: String
+    @State private var nowPlayingMovies: [MovieModel] = []
+    private let tmdbService = TMDBService()
     
-    var title1:String
-    var title2:String
-    
-  var body: some View {
+    var body: some View {
         VStack(alignment: .leading) {
             Text(title1)
                 .font(.title)
@@ -22,37 +23,38 @@ struct NowPlayingSection: View {
             Text(title2)
                 .font(.subheadline)
                 .foregroundColor(.gray)
-
             
-            ScrollView(.horizontal) {
+            ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    
-                    VerticalMovieCard(
-                        selectedDestination: .movieDetail,
-                        movieId: 1232454
-                    )
-                    
-                    VerticalMovieCard(
-                        selectedDestination: .movieDetail,
-                        movieId: 1232454
-                    )
-                    
-                    VerticalMovieCard(
-                        selectedDestination: .movieDetail,
-                        movieId: 1232454
-                    )
-                    
-                    VerticalMovieCard(
-                        selectedDestination: .movieDetail,
-                        movieId: 1232454
-                    )
+                    ForEach(nowPlayingMovies, id: \.id) { movie in
+                        VerticalMovieCard(
+                            selectedDestination: .movieDetail,
+                            movieId: movie.id
+                        )
+                    }
                 }
             }
         }
         .background(Color.black)
+        .onAppear {
+            fetchNowPlayingMovies()
+        }
+    }
+    
+    private func fetchNowPlayingMovies() {
+        tmdbService.fetchNowPlayingMovies { result in
+            switch result {
+            case .success(let movies):
+                DispatchQueue.main.async {
+                    self.nowPlayingMovies = Array(movies.prefix(10)) 
+                }
+            case .failure(let error):
+                print("Error fetching now playing movies: \(error)")
+            }
+        }
     }
 }
 
 #Preview {
-    NowPlayingSection(title1: "Now Playing", title2: "Current  Films on Big Screens")
+    NowPlayingSection(title1: "Now Playing", title2: "Current Films on Big Screens")
 }
