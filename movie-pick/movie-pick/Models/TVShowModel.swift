@@ -23,7 +23,7 @@ struct TVShowModel: Codable, Identifiable {
     let voteAverage: Double?
     let voteCount: Int?
     let genreIds: [Int]?
-    let genres: [Genre]?
+    var genres: [Genre]?
     let popularity: Double?
     let originalLanguage: String?
     let episodeRunTime: [Int]?

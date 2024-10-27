@@ -32,7 +32,7 @@ struct ShowDiscoverSection: View {
                     }
 
                     if !remainingCategories.isEmpty {
-                        NavigationLink(destination: DiscoverDetail()) {
+                        NavigationLink(destination: ShowDiscoverDetail()) {
                             CategoryButtonView(title: "More...")
                         }
                     }
