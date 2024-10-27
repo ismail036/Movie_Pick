@@ -116,11 +116,11 @@ struct ShowDetail: View {
                     if selectedTab == 0 {
                         ShowOverviewTab(showId: self.showId)
                     } else if selectedTab == 1 {
-                        SeasonsTab()
+                        SeasonsTab(showId: self.showId, episodeRuntime: showDetail?.episodeRunTime?.first)
                     } else if selectedTab == 2 {
-                        PhotosAndVideosTab(movieId: showId)
+                        ShowPhotosAndVideosTab(showId: showId)
                     } else {
-                        ReviewsTab(movieId: showId)
+                        ShowReviewsTab(showId: showId)
                     }
 
                     Spacer()
@@ -178,31 +178,27 @@ struct ShowDetail: View {
     }
 }
 
-
-
-
 struct ShowTabButtonsView: View {
     @Binding var selectedTab: Int
     
     var body: some View {
         HStack(spacing: 0) {
-            TabButton(title: "Overview", isSelected: selectedTab == 0, fontSize: 14)
+            TabButton(title: "Overview", isSelected: selectedTab == 0, fontSize: 16)
                 .onTapGesture {
                     selectedTab = 0
                 }
                 .frame(maxWidth: .infinity)
-            TabButton(title: "Seasons", isSelected: selectedTab == 1, fontSize: 14)
+            TabButton(title: "Seasons", isSelected: selectedTab == 1, fontSize: 16)
                 .onTapGesture {
                     selectedTab = 1
                 }
                 .frame(maxWidth: .infinity)
-            TabButton(title: "Photos and Videos", isSelected: selectedTab == 2, fontSize: 14)
+            TabButton(title: "Photos and Videos", isSelected: selectedTab == 2, fontSize: 16)
                 .onTapGesture {
                     selectedTab = 2
                 }
                 .frame(maxWidth: .infinity)
-            
-            TabButton(title: "Reviews", isSelected: selectedTab == 3, fontSize: 14)
+            TabButton(title: "Reviews", isSelected: selectedTab == 3, fontSize: 16)
                 .onTapGesture {
                     selectedTab = 3
                 }
@@ -213,44 +209,62 @@ struct ShowTabButtonsView: View {
     }
 }
 
-
 struct SeasonsTab: View {
+    var showId: Int
+    var episodeRuntime: Int?
+    @State private var seasons: [TVSeason] = []
+    @State private var showPosterURL: URL?
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Seasons")
                 .font(.title2)
                 .bold()
 
-            Text("Episodes: 30 Episodes / 20 hr 11 min")
-                .font(.subheadline)
-                .foregroundColor(.gray)
-
-            ScrollView {
-                VStack(spacing: 10) {
-                    NavigationLink(destination: SeasonDetailView(season: Season(seasonName: "Seasons 1", episodeCount: 10, duration: "8 hr 26 min", imageURL: "https://miro.medium.com/v2/resize:fit:1400/1*39M4XbHXCTfBenNNqLLyLA@2x.jpeg"))) {
-                        SeasonRow(season: Season(seasonName: "Seasons 1", episodeCount: 10, duration: "8 hr 26 min", imageURL: "https://miro.medium.com/v2/resize:fit:1400/1*39M4XbHXCTfBenNNqLLyLA@2x.jpeg"))
-                    }
-
-                    NavigationLink(destination: SeasonDetailView(season: Season(seasonName: "Seasons 2", episodeCount: 10, duration: "8 hr 19 min", imageURL: "https://resizing.flixster.com/xyR4st6BC93nnWjN5fsfnLm_ncM=/fit-in/352x330/v2/https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p21200256_i_v13_aa.jpg"))) {
-                        SeasonRow(season: Season(seasonName: "Seasons 2", episodeCount: 10, duration: "8 hr 19 min", imageURL: "https://resizing.flixster.com/xyR4st6BC93nnWjN5fsfnLm_ncM=/fit-in/352x330/v2/https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p21200256_i_v13_aa.jpg"))
-                    }
-
-                    NavigationLink(destination: SeasonDetailView(season: Season(seasonName: "Seasons 3", episodeCount: 10, duration: "3 hr 26 min", imageURL: "https://resizing.flixster.com/xyR4st6BC93nnWjN5fsfnLm_ncM=/fit-in/352x330/v2/https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p21200256_i_v13_aa.jpg"))) {
-                        SeasonRow(season: Season(seasonName: "Seasons 3", episodeCount: 10, duration: "3 hr 26 min", imageURL: "https://resizing.flixster.com/xyR4st6BC93nnWjN5fsfnLm_ncM=/fit-in/352x330/v2/https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p21200256_i_v13_aa.jpg"))
+            if seasons.isEmpty {
+                Text("Loading...")
+                    .foregroundColor(.gray)
+                    .font(.subheadline)
+            } else {
+                ScrollView {
+                    VStack(spacing: 10) {
+                        ForEach(seasons) { season in
+                            NavigationLink(destination: SeasonDetailView(showId: self.showId , season: season, episodeRuntime: episodeRuntime)) {
+                                SeasonRow(season: season, defaultPosterURL: showPosterURL)
+                            }
+                        }
                     }
                 }
             }
         }
         .padding(.horizontal)
+        .onAppear {
+            fetchSeasons()
+        }
+    }
+
+    private func fetchSeasons() {
+        TMDBService().fetchTVShowDetails(showId: showId) { result in
+            switch result {
+            case .success(let showDetail):
+                DispatchQueue.main.async {
+                    self.showPosterURL = showDetail.posterURL
+                    self.seasons = showDetail.seasons ?? []
+                }
+            case .failure(let error):
+                print("Seasons could not be loaded: \(error.localizedDescription)")
+            }
+        }
     }
 }
 
 struct SeasonRow: View {
-    let season: Season
+    let season: TVSeason
+    let defaultPosterURL: URL?
 
     var body: some View {
         HStack {
-            AsyncImage(url: URL(string: season.imageURL)) { image in
+            AsyncImage(url: season.posterURL ?? defaultPosterURL) { image in
                 image
                     .resizable()
                     .scaledToFill()
@@ -264,12 +278,18 @@ struct SeasonRow: View {
             }
 
             VStack(alignment: .leading) {
-                Text(season.seasonName)
+                Text(season.name)
                     .font(.headline)
 
-                Text("\(season.episodeCount) Episodes, \(season.duration)")
+                Text("\(season.episodeCount) Episodes")
                     .font(.subheadline)
                     .foregroundColor(.gray)
+
+                if let airDate = season.formattedAirDate {
+                    Text("Air Date: \(airDate)")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
             }
 
             Spacer()
@@ -278,119 +298,137 @@ struct SeasonRow: View {
                 .foregroundColor(.gray)
         }
         .padding(.vertical, 5)
-    }
-}
-
-struct Episode: Identifiable {
-    let id = UUID()
-    let episodeNumber: Int
-    let title: String
-    let airDate: String
-    let duration: String
-    let description: String
-    let thumbnailURL: String
-}
-
-struct EpisodeRow: View {
-    let episode: Episode
-
-    var body: some View {
-        HStack {
-            AsyncImage(url: URL(string: episode.thumbnailURL)) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 100, height: 80)
-                    .cornerRadius(10)
-                    .clipped()
-            } placeholder: {
-                Color.gray
-                    .frame(width: 100, height: 80)
-                    .cornerRadius(10)
-            }
-
-            VStack(alignment: .leading) {
-                Text("S01 : E\(episode.episodeNumber)")
-                    .font(.headline)
-                    .foregroundColor(.white)
-
-                Text(episode.title)
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-            }
-
-            Spacer()
-
-            Image(systemName: "chevron.right")
-                .foregroundColor(.gray)
-        }
-        .padding(.vertical, 5)
-        .padding(.horizontal)
     }
 }
 
 struct SeasonDetailView: View {
-    let season: Season
-    let episodes: [Episode] = [
-        Episode(episodeNumber: 1, title: "Long Day's Journey Into Night", airDate: "April 1, 2023", duration: "1 hr", description: "A thrilling start to the season with unexpected twists and turns.", thumbnailURL: "https://resizing.flixster.com/xyR4st6BC93nnWjN5fsfnLm_ncM=/fit-in/352x330/v2/https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p21200256_i_v13_aa.jpg"),
-        Episode(episodeNumber: 2, title: "The Way Things Are Now", airDate: "April 8, 2023", duration: "1 hr", description: "Tensions rise as unexpected events unfold.", thumbnailURL: "https://resizing.flixster.com/xyR4st6BC93nnWjN5fsfnLm_ncM=/fit-in/352x330/v2/https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p21200256_i_v13_aa.jpg"),
-        Episode(episodeNumber: 3, title: "Choosing Day", airDate: "April 15, 2023", duration: "1 hr", description: "Critical decisions change the course of events.", thumbnailURL: "https://resizing.flixster.com/xyR4st6BC93nnWjN5fsfnLm_ncM=/fit-in/352x330/v2/https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p21200256_i_v13_aa.jpg"),
-        Episode(episodeNumber: 4, title: "A Rock and a Farway", airDate: "April 22, 2023", duration: "1 hr", description: "Survival becomes harder as resources dwindle.", thumbnailURL: "https://resizing.flixster.com/xyR4st6BC93nnWjN5fsfnLm_ncM=/fit-in/352x330/v2/https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p21200256_i_v13_aa.jpg"),
-        Episode(episodeNumber: 5, title: "Silhouettes", airDate: "April 29, 2023", duration: "1 hr", description: "The enemy gets closer, and alliances are tested.", thumbnailURL: "https://resizing.flixster.com/xyR4st6BC93nnWjN5fsfnLm_ncM=/fit-in/352x330/v2/https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p21200256_i_v13_aa.jpg"),
-        Episode(episodeNumber: 6, title: "Book 74", airDate: "May 6, 2023", duration: "1 hr", description: "The group's secrets are finally revealed.", thumbnailURL: "https://resizing.flixster.com/xyR4st6BC93nnWjN5fsfnLm_ncM=/fit-in/352x330/v2/https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p21200256_i_v13_aa.jpg"),
-        Episode(episodeNumber: 7, title: "All Good Things", airDate: "May 13, 2023", duration: "1 hr", description: "The season ends with shocking revelations.", thumbnailURL: "https://resizing.flixster.com/xyR4st6BC93nnWjN5fsfnLm_ncM=/fit-in/352x330/v2/https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p21200256_i_v13_aa.jpg")
-    ]
+    let showId: Int
+    let season: TVSeason
+    let episodeRuntime: Int?
+    @State private var episodes: [Episode] = []
     @Environment(\.dismiss) var dismiss
+
     var body: some View {
-        ScrollView {
-            ForEach(episodes) { episode in
-                NavigationLink(destination: EpisodeDetailView(
-                    episodeTitle: episode.title,
-                    seasonNumber: 1,
-                    episodeNumber: episode.episodeNumber,
-                    episodeAirDate: episode.airDate,
-                    episodeDuration: episode.duration,
-                    episodeDescription: episode.description,
-                    episodeThumbnailURL: episode.thumbnailURL)) {
-                    EpisodeRow(episode: episode)
+        VStack(alignment: .leading, spacing: 10) {
+            // Başlık kısmı
+            HStack {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "arrow.backward.circle")
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(.white)
+                }
+                
+                Spacer()
+                
+                Text(season.name)
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(.white)
+                
+                Spacer()
+            }
+            .padding(.vertical)
+            
+            Text("\(season.name)")
+                .font(.title2)
+                .bold()
+                .padding(.top, 8)
+
+            Text("\(season.episodeCount) Episodes, \(formattedTotalDuration())")
+                .font(.subheadline)
+                .foregroundColor(.gray)
+
+            if episodes.isEmpty {
+                Text("Loading episodes...")
+                    .foregroundColor(.gray)
+                    .font(.subheadline)
+            } else {
+                ScrollView {
+                    ForEach(episodes) { episode in
+                        EpisodeRow(episode: episode,showId:showId)
+                    }
                 }
             }
         }
-        .navigationTitle(season.seasonName)
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: backButton)
-        .background(Color.black.ignoresSafeArea())
-    }
-    
-    
-    var backButton: some View {
-        Button(action: {
-            dismiss()
-        }) {
-            Image(systemName: "arrow.backward.circle")
-                .resizable()
-                .frame(width: 24, height: 24)
-                .foregroundColor(.white)
+        .padding(.horizontal)
+        .background(Color.black.edgesIgnoringSafeArea(.all))
+        .navigationBarHidden(true)
+        .onAppear {
+            fetchEpisodes()
         }
     }
+
+    private func fetchEpisodes() {
+        TMDBService().fetchEpisodes(showId: showId, seasonNumber: season.seasonNumber) { result in
+            switch result {
+            case .success(let fetchedEpisodes):
+                DispatchQueue.main.async {
+                    self.episodes = fetchedEpisodes
+                }
+            case .failure(let error):
+                print("Episodes could not be loaded: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func formattedTotalDuration() -> String {
+        let totalMinutes = (season.episodeCount * (episodeRuntime ?? 0))
+        let hours = totalMinutes / 60
+        let minutes = totalMinutes % 60
+        return "\(hours) hr \(minutes) min"
+    }
 }
 
+struct EpisodeRow: View {
+    let episode: Episode
+    let showId :Int
 
+    var body: some View {
+        NavigationLink(destination: EpisodeDetailView(showId: showId, seasonNumber:episode.seasonNumber , episodeNumber: episode.episodeNumber)){
+            HStack {
+                AsyncImage(url: episode.stillURL) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 100, height: 80)
+                        .cornerRadius(10)
+                        .clipped()
+                } placeholder: {
+                    Color.gray
+                        .frame(width: 100, height: 80)
+                        .cornerRadius(10)
+                }
 
+                VStack(alignment: .leading) {
+                    Text("S\(episode.seasonNumber) : E\(episode.episodeNumber)")
+                        .font(.headline)
+                        .foregroundColor(.white)
 
+                    Text(episode.name)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
 
+                    if let airDate = episode.formattedAirDate {
+                        Text(airDate)
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                }
 
-struct Season: Identifiable {
-    let id = UUID()
-    let seasonName: String
-    let episodeCount: Int
-    let duration: String
-    let imageURL: String
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.gray)
+            }
+            .padding(.vertical, 5)
+            .padding(.horizontal)
+            .onAppear() {
+                print(episode)
+            }
+        }
+        
+    }
 }
-
-
-
 
 #Preview {
     ShowDetail(showId: 1396)

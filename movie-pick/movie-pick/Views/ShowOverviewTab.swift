@@ -40,13 +40,13 @@ struct ShowOverviewTab: View {
             }
             .padding()
             
-            CastCrewSection(movieId: self.showId)
+            ShowCastCrewSection(showId: self.showId)
 
-            VideosSection(movieId: self.showId)
+            ShowVideosSection(showId: self.showId)
             
-            MoreLikeThisSection(movieId: self.showId)
+            ShowMoreLikeThisSection(showId: self.showId)
             
-            MovieDetailInfoCard(movieId: self.showId)
+            ShowDetailInfoCard(showId: self.showId)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.mainColor1)
@@ -54,7 +54,7 @@ struct ShowOverviewTab: View {
     }
     
     func truncatedDescription() -> String {
-        let limit = 150 // Approximate character count to fit 3 lines
+        let limit = 150 
         if overview.count > limit {
             let endIndex = overview.index(overview.startIndex, offsetBy: limit)
             return String(overview[..<endIndex])

@@ -5,13 +5,6 @@
 //  Created by İsmail Parlak on 23.10.2024.
 //
 
-//
-//  MoreLikeThisDetail.swift
-//  movie-pick
-//
-//  Created by İsmail Parlak on 23.10.2024.
-//
-
 import SwiftUI
 
 struct MoreLikeThisDetail: View {

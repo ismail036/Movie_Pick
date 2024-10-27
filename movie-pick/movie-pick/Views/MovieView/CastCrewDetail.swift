@@ -5,13 +5,6 @@
 //  Created by İsmail Parlak on 23.10.2024.
 //
 
-//
-//  CastCrewDetail.swift
-//  movie-pick
-//
-//  Created by İsmail Parlak on 23.10.2024.
-//
-
 import SwiftUI
 
 struct CastCrewDetail: View {
@@ -25,7 +18,6 @@ struct CastCrewDetail: View {
 
     var body: some View {
         VStack {
-            // Tab bar
             HStack(spacing: 0) {
                 TabButton(title: "Cast", isSelected: selectedTab == 0, fontSize: 20)
                     .onTapGesture {
@@ -41,14 +33,12 @@ struct CastCrewDetail: View {
             }
             .padding(.top)
             
-            // Content based on selected tab
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
                     if selectedTab == 0 {
-                        // Cast List
                         ForEach(castMembers) { member in
                             PopularPeopleCard(
-                                imageUrl: member.profileURL, // Profil URL'si async yükleme için
+                                imageUrl: member.profileURL,
                                 name: member.name,
                                 desc: member.character ?? "Unknown Role"
                             )
@@ -57,7 +47,7 @@ struct CastCrewDetail: View {
                         // Crew List
                         ForEach(crewMembers) { member in
                             PopularPeopleCard(
-                                imageUrl: member.profileURL, // Profil URL'si async yükleme için
+                                imageUrl: member.profileURL, 
                                 name: member.name,
                                 desc: member.job ?? "Unknown Job"
                             )

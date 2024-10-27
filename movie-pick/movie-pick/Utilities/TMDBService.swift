@@ -661,7 +661,7 @@ class TMDBService {
 
 
     func fetchTVShowDetails(showId: Int, completion: @escaping (Result<TVShowDetailModel, Error>) -> Void) {
-        let endpoint = "\(TMDBAPI.baseURL)/tv/\(showId)"
+        let endpoint = "\(TMDBAPI.baseURL)/tv/\(showId)?append_to_response=images"
         guard let url = URL(string: endpoint) else { return }
 
         var request = URLRequest(url: url)
@@ -684,7 +684,7 @@ class TMDBService {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
                 let showDetails = try decoder.decode(TVShowDetailModel.self, from: data)
-                print("Fetched episodeRunTime:", showDetails.episodeRunTime ?? "No episode runtime found")
+                print("Fetched images for show ID \(showId):", showDetails.images ?? "No images found")
                 completion(.success(showDetails))
             } catch {
                 print("Error decoding TV show details: \(error.localizedDescription)")
@@ -734,7 +734,129 @@ class TMDBService {
         task.resume()
     }
 
+    
+    func fetchShowSeasons(showId: Int, completion: @escaping (Result<[TVSeason], Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/tv/\(showId)?append_to_response=seasons"
+        guard let url = URL(string: endpoint) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching seasons: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for seasons")
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let showDetail = try decoder.decode(TVShowDetailModel.self, from: data)
+                completion(.success(showDetail.seasons ?? []))
+            } catch {
+                print("Error decoding seasons: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+
+    
+
+    func fetchEpisodes(showId: Int, seasonNumber: Int, completion: @escaping (Result<[Episode], Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/tv/\(showId)/season/\(seasonNumber)"
+        guard let url = URL(string: endpoint) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching episodes: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                print("No data received for episodes")
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let seasonDetail = try decoder.decode(TVSeasonDetail.self, from: data)
+                completion(.success(seasonDetail.episodes))
+            } catch {
+                print("Error decoding episodes: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+    
+    
+    func fetchAllShowReviews(showId: Int, completion: @escaping (Result<[FetchedReview], Error>) -> Void) {
+        var allReviews: [FetchedReview] = []
+        var currentPage = 1
+
+        func fetchPage() {
+            let endpoint = "\(TMDBAPI.baseURL)/tv/\(showId)/reviews?page=\(currentPage)"
+            guard let url = URL(string: endpoint) else { return }
+
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Error fetching reviews: \(error.localizedDescription)")
+                    completion(.failure(error))
+                    return
+                }
+
+                guard let data = data else {
+                    print("No data received for reviews")
+                    completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                    return
+                }
+
+                do {
+                    let decoder = JSONDecoder()
+                    decoder.keyDecodingStrategy = .convertFromSnakeCase
+                    let reviewResponse = try decoder.decode(ReviewResponse.self, from: data)
+                    allReviews.append(contentsOf: reviewResponse.results)
+
+                    if reviewResponse.results.isEmpty || currentPage >= (reviewResponse.totalPages ?? 1) {
+                        completion(.success(allReviews))
+                    } else {
+                        currentPage += 1
+                        fetchPage()
+                    }
+                } catch {
+                    print("Error decoding reviews: \(error.localizedDescription)")
+                    completion(.failure(error))
+                }
+            }
+            task.resume()
+        }
+
+        fetchPage()
+    }
+    
 }
+
+
+
+
 
 struct GenreResponse: Codable {
     let genres: [Genre]
