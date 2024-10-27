@@ -45,7 +45,7 @@ struct ShowView: View {
                     
                     Spacer().frame(height: 16)
                     
-                    DiscoverSection(text: "Explore Movies and uncover new favorites")
+                    ShowDiscoverSection(text: "Explore Movies and uncover new favorites")
                     
                     
                     Spacer().frame(height: 16)

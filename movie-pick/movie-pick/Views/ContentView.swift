@@ -4,7 +4,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab = 0
-    private let tmdbService = TMDBService() // TMDBService örneği
+    private let tmdbService = TMDBService() 
     
     init() {
         let appearance = UITabBarAppearance()
