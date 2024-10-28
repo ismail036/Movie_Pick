@@ -51,11 +51,11 @@ struct ShowView: View {
                     Spacer().frame(height: 16)
                     
                 
-                    ComingSoonSection()
+                    ShowComingSoonSection()
                     Spacer().frame(height: 16)
                     
                     
-                    StreamingProvidersSection()
+                    ShowStreamingProvidersSection()
                     Spacer().frame(height: 16)
                     
                     NowPlayingSection(title1: "Top Rated", title2: "The Best-Ranked Series Out There")
