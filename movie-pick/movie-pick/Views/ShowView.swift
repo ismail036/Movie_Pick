@@ -58,12 +58,12 @@ struct ShowView: View {
                     ShowStreamingProvidersSection()
                     Spacer().frame(height: 16)
                     
-                    NowPlayingSection(title1: "Top Rated", title2: "The Best-Ranked Series Out There")
+                    ShowTopRatedSection(title1: "Top Rated", title2: "The Best-Ranked Series Out There")
                     
                     Spacer().frame(height: 16)
                     
-                    NowPlayingSection(title1: "On Air", title2: "TV Shows that air in the 7 days")
-                    
+                    OnAirSection(title1: "On Air", title2: "TV Shows that aired in the last 7 days")
+
                     
                     Spacer().frame(height: 50)
                 }
