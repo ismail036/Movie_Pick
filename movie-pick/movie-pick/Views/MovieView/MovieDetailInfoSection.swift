@@ -15,6 +15,7 @@ struct MovieDetailInfoSection: View {
     @State private var voteCount: Int = 0
     @State private var runtime: Int = 0
     @State private var releaseDate: String = ""
+    @State private var isBookmarked: Bool = false
 
     var body: some View {
         VStack(spacing: 10) {
@@ -100,9 +101,11 @@ struct MovieDetailInfoSection: View {
                     }
                     .padding(.horizontal, 5)
                     
-                    Button(action: {}) {
+                    Button(action: {
+                        toggleBookmark()
+                    }) {
                         VStack {
-                            Image(systemName: "bookmark")
+                            Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 16, height: 16)
@@ -204,14 +207,13 @@ struct MovieDetailInfoSection: View {
             }
             .frame(height: 40)
             .onAppear {
-                        fetchMovieDetails()
-                    }
+                fetchMovieDetails()
+                checkIfBookmarked()
+            }
         }
         .background(Color.black)
     }
         
-    
-    // Movie detaylarını çekmek için fonksiyon
     private func fetchMovieDetails() {
         TMDBService().fetchMovieDetails(movieId: movie.id) { result in
             switch result {
@@ -229,6 +231,34 @@ struct MovieDetailInfoSection: View {
             }
         }
     }
+    
+    private func toggleBookmark() {
+        isBookmarked.toggle()
+        if isBookmarked {
+            saveToFavorites()
+        } else {
+            removeFromFavorites()
+        }
+    }
+    
+    private func saveToFavorites() {
+        var favoriteMovies = UserDefaults.standard.array(forKey: "favoriteMovieIds") as? [Int] ?? []
+        favoriteMovies.append(movie.id)
+        
+        UserDefaults.standard.set(favoriteMovies, forKey: "favoriteMovieIds")
+    }
+    
+    private func removeFromFavorites() {
+        var favoriteMovies = UserDefaults.standard.array(forKey: "favoriteMovieIds") as? [Int] ?? []
+        favoriteMovies.removeAll { $0 == movie.id }
+        
+        UserDefaults.standard.set(favoriteMovies, forKey: "favoriteMovieIds")
+    }
+    
+    private func checkIfBookmarked() {
+        let favoriteMovies = UserDefaults.standard.array(forKey: "favoriteMovieIds") as? [Int] ?? []
+        isBookmarked = favoriteMovies.contains(movie.id)
+    }
 }
 
 
@@ -237,3 +267,4 @@ struct MovieDetailInfoSection: View {
         id: 1184918, title: "The Wild Robot", originalTitle: Optional("The Wild Robot"), overview: "After a shipwreck, an intelligent robot called Roz is stranded on an uninhabited island. To survive the harsh environment, Roz bonds with the island\'s animals and cares for an orphaned baby goose.", posterPath: Optional("/wTnV3PCVW5O92JMrFvvrRcV39RU.jpg"), backdropPath: Optional("/417tYZ4XUyJrtyZXj7HpvWf1E8f.jpg"), releaseDate: Optional("2024-09-12"), runtime: nil, voteAverage: Optional(8.641), voteCount: Optional(1514), genreIds: Optional([16, 878, 10751]), genres: nil, popularity: Optional(5400.805), originalLanguage: Optional("en"), adult: Optional(false), budget: nil, revenue: nil, tagline: nil, homepage: nil, status: nil
     ))
 }
+

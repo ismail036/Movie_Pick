@@ -8,8 +8,11 @@
 import SwiftUI
 import SwiftData
 
+
 @main
 struct movie_pickApp: App {
+    @AppStorage("isFirstLaunch") private var isFirstLaunch: Bool = true
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
@@ -25,7 +28,7 @@ struct movie_pickApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SplashView(isFirstLaunch: $isFirstLaunch)
         }
         .modelContainer(sharedModelContainer)
     }

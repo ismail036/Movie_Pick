@@ -5,6 +5,13 @@
 //  Created by İsmail Parlak on 27.10.2024.
 //
 
+//
+//  ShowDetailInfoSection.swift
+//  movie-pick
+//
+//  Created by İsmail Parlak on 27.10.2024.
+//
+
 import SwiftUI
 
 struct ShowDetailInfoSection: View {
@@ -15,6 +22,7 @@ struct ShowDetailInfoSection: View {
     @State private var voteCount: Int = 0
     @State private var episodeRunTime: Int = 0
     @State private var firstAirDate: String = ""
+    @State private var isBookmarked: Bool = false
 
     var body: some View {
         VStack(spacing: 10) {
@@ -100,9 +108,11 @@ struct ShowDetailInfoSection: View {
                     }
                     .padding(.horizontal, 5)
                     
-                    Button(action: {}) {
+                    Button(action: {
+                        toggleBookmark()
+                    }) {
                         VStack {
-                            Image(systemName: "bookmark")
+                            Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 16, height: 16)
@@ -205,13 +215,12 @@ struct ShowDetailInfoSection: View {
             .frame(height: 40)
             .onAppear {
                         fetchShowDetails()
+                        checkIfBookmarked()
                     }
         }
         .background(Color.black)
     }
         
-    
-    // Dizi detaylarını çekmek için fonksiyon
     private func fetchShowDetails() {
         TMDBService().fetchTVShowDetails(showId: showId) { result in
             switch result {
@@ -228,6 +237,34 @@ struct ShowDetailInfoSection: View {
                 print("Failed to fetch show details: \(error.localizedDescription)")
             }
         }
+    }
+    
+    private func toggleBookmark() {
+        isBookmarked.toggle()
+        if isBookmarked {
+            saveToFavorites()
+        } else {
+            removeFromFavorites()
+        }
+    }
+    
+    private func saveToFavorites() {
+        var favoriteShows = UserDefaults.standard.array(forKey: "favoriteShowIds") as? [Int] ?? []
+        favoriteShows.append(showId)
+        
+        UserDefaults.standard.set(favoriteShows, forKey: "favoriteShowIds")
+    }
+    
+    private func removeFromFavorites() {
+        var favoriteShows = UserDefaults.standard.array(forKey: "favoriteShowIds") as? [Int] ?? []
+        favoriteShows.removeAll { $0 == showId }
+        
+        UserDefaults.standard.set(favoriteShows, forKey: "favoriteShowIds")
+    }
+    
+    private func checkIfBookmarked() {
+        let favoriteShows = UserDefaults.standard.array(forKey: "favoriteShowIds") as? [Int] ?? []
+        isBookmarked = favoriteShows.contains(showId)
     }
 }
 

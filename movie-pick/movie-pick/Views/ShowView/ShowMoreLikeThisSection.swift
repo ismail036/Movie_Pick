@@ -73,6 +73,8 @@ struct ShowMoreLikeThisSection: View {
 extension TMDBService {
     func fetchShowDetailsWithSimilarShows(showId: Int, completion: @escaping (Result<TVShowDetailModel, Error>) -> Void) {
         let endpoint = "\(TMDBAPI.baseURL)/tv/\(showId)?append_to_response=similar"
+        
+        
         guard let url = URL(string: endpoint) else {
             completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
             return

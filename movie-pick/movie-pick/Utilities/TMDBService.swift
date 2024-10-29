@@ -627,7 +627,14 @@ class TMDBService {
     
     func fetchAiringTodayShows(completion: @escaping (Result<[TVShowModel], Error>) -> Void) {
         let endpoint = "\(TMDBAPI.baseURL)/tv/airing_today"
-        guard let url = URL(string: endpoint) else { return }
+        guard var urlComponents = URLComponents(string: endpoint) else { return }
+
+        // "region" parametresini "us" olarak ekleyelim
+        urlComponents.queryItems = [
+            URLQueryItem(name: "region", value: "US")
+        ]
+        
+        guard let url = urlComponents.url else { return }
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -642,6 +649,7 @@ class TMDBService {
 
             guard let data = data else {
                 print("No data received for airing today shows")
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
                 return
             }
 
@@ -660,10 +668,18 @@ class TMDBService {
 
 
 
+
     func fetchTVShowDetails(showId: Int, completion: @escaping (Result<TVShowDetailModel, Error>) -> Void) {
         let endpoint = "\(TMDBAPI.baseURL)/tv/\(showId)?append_to_response=images"
-        guard let url = URL(string: endpoint) else { return }
+        guard var urlComponents = URLComponents(string: endpoint) else { return }
 
+        // "region" parametresini "us" olarak ekleyelim
+        urlComponents.queryItems = [
+            URLQueryItem(name: "region", value: "US")
+        ]
+        
+        guard let url = urlComponents.url else { return }
+        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
@@ -699,11 +715,13 @@ class TMDBService {
     
     func fetchShowById(showId: Int, completion: @escaping (Result<TVShowModel, Error>) -> Void) {
         let endpoint = "\(TMDBAPI.baseURL)/tv/\(showId)"
-        guard let url = URL(string: endpoint) else {
-            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
-            return
-        }
+        guard var urlComponents = URLComponents(string: endpoint) else { return }
 
+        urlComponents.queryItems = [
+            URLQueryItem(name: "region", value: "US")
+        ]
+        
+        guard let url = urlComponents.url else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
@@ -737,7 +755,14 @@ class TMDBService {
     
     func fetchShowSeasons(showId: Int, completion: @escaping (Result<[TVSeason], Error>) -> Void) {
         let endpoint = "\(TMDBAPI.baseURL)/tv/\(showId)?append_to_response=seasons"
-        guard let url = URL(string: endpoint) else { return }
+        guard var urlComponents = URLComponents(string: endpoint) else { return }
+
+        // "region" parametresini "us" olarak ekleyelim
+        urlComponents.queryItems = [
+            URLQueryItem(name: "region", value: "US")
+        ]
+        
+        guard let url = urlComponents.url else { return }
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -772,7 +797,14 @@ class TMDBService {
 
     func fetchEpisodes(showId: Int, seasonNumber: Int, completion: @escaping (Result<[Episode], Error>) -> Void) {
         let endpoint = "\(TMDBAPI.baseURL)/tv/\(showId)/season/\(seasonNumber)"
-        guard let url = URL(string: endpoint) else { return }
+        guard var urlComponents = URLComponents(string: endpoint) else { return }
+
+        // "region" parametresini "us" olarak ekleyelim
+        urlComponents.queryItems = [
+            URLQueryItem(name: "region", value: "US")
+        ]
+        
+        guard let url = urlComponents.url else { return }
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -851,6 +883,55 @@ class TMDBService {
 
         fetchPage()
     }
+    
+    
+    func fetchPopularMoviesByGenre(genreId: Int, completion: @escaping (Result<MovieModel, Error>) -> Void) {
+        let endpoint = "https://api.themoviedb.org/3/discover/movie"
+        guard var urlComponents = URLComponents(string: endpoint) else {
+            print("Invalid URL Components")
+            return
+        }
+        
+        urlComponents.queryItems = [
+            URLQueryItem(name: "api_key", value: TMDBAPI.apiKey),
+            URLQueryItem(name: "with_genres", value: "\(genreId)"),
+            URLQueryItem(name: "sort_by", value: "popularity.desc"),
+            URLQueryItem(name: "page", value: "1")
+        ]
+        
+        guard let url = urlComponents.url else {
+            print("URL oluşumunda hata")
+            return
+        }
+        
+        print("Request URL: \(url)")
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+            
+            do {
+                let response = try JSONDecoder().decode(MovieResponse.self, from: data)
+                if let firstMovie = response.results.first {
+                    completion(.success(firstMovie))
+                } else {
+                    completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No movie found"])))
+                }
+            } catch {
+                print("Decoding Error: \(error)")
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+
+    
     
 }
 

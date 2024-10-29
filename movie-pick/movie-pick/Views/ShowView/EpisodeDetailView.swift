@@ -38,7 +38,7 @@ struct EpisodeDetailView: View {
                         }
                         
                         VStack(alignment: .center) {
-                            Text("FROM")
+                            Text(episodeDetail?.name ?? "")
                                 .font(.system(size: 24))
                                 .bold()
                                 .foregroundColor(.white)
