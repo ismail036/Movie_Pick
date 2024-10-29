@@ -322,55 +322,152 @@
 
 
 
+struct RemindersTab: View {
+    @State private var reminders: [(title: String, date: String, movieId: Int, posterURL: String?, genres: String, remainingTime: String)] = []
 
-
-
-
-
-
-
-
-
-    struct RemindersTab: View {
-        var body: some View {
-            VStack {
+    var body: some View {
+        VStack {
+            if reminders.isEmpty {
                 Spacer()
                 Image(systemName: "bell.fill")
                     .font(.system(size: 120))
                     .background(Color.cyanBlue)
                     .cornerRadius(20)
-                    .padding(.bottom,10)
-                
+                    .padding(.bottom, 10)
+
                 Text("No Reminders set")
                     .foregroundColor(.white)
                     .font(.title)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.bottom,5)
-                
-                Text("Plan your watching schedule by adding movies or tv shows here.")
+                    .padding(.bottom, 5)
+
+                Text("Plan your watching schedule by adding movies or TV shows here.")
                     .foregroundColor(.white)
                     .font(.subheadline)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.bottom,5)
-                
-                NavigationLink(destination: EmptyView()) {
-                    Text("Add")
-                        .foregroundStyle(Color.white)
-                        .font(.system(size: 20))
-                        .padding(.all, 10)
-                }
-                .background(Color.gray)
-                .cornerRadius(20)
-                
+                    .padding(.bottom, 5)
+
                 Spacer()
+            } else {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(reminders, id: \.title) { reminder in
+                            HStack(spacing: 16) {
+                                if let posterURL = reminder.posterURL, let url = URL(string: posterURL) {
+                                    AsyncImage(url: url) { image in
+                                        image
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                            .frame(width: 100, height: 150)
+                                            .cornerRadius(8)
+                                    } placeholder: {
+                                        Rectangle()
+                                            .fill(Color.gray)
+                                            .frame(width: 100, height: 150)
+                                            .cornerRadius(8)
+                                    }
+                                } else {
+                                    Rectangle()
+                                        .fill(Color.gray)
+                                        .frame(width: 100, height: 150)
+                                        .cornerRadius(8)
+                                }
+                                
+                                VStack(alignment: .leading) {
+                                    Text(reminder.title)
+                                        .foregroundColor(.white)
+                                        .font(.headline)
+                                    
+                                    Text(reminder.genres) // Türler burada gösterilecek
+                                        .foregroundColor(.gray)
+                                        .font(.subheadline)
+
+                                    
+                                    HStack {
+                                        Image(systemName: "bell.fill")
+                                            .foregroundColor(.white)
+                                        Text(reminder.remainingTime) // Kalan zaman burada gösterilecek
+                                            .foregroundColor(.gray)
+                                            .font(.subheadline)
+                                    }
+                                }
+                                .padding(.leading, 10)
+                                
+                                Spacer()
+                            }
+                            .padding()
+                            .background(Color.black.opacity(0.7))
+                            .cornerRadius(10)
+                            .shadow(radius: 4)
+                        }
+                    }
+                    .padding()
+                }
+                .background(Color.mainColor1)
             }
-            .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.horizontal, 50)
+        }
+        .onAppear(perform: loadReminders)
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(.horizontal, 10)
+        .background(Color.mainColor1)
+    }
+
+    private func loadReminders() {
+        if let data = UserDefaults.standard.data(forKey: "reminders"),
+           let savedReminders = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: [String: Any]] {
+            
+            var tempReminders: [(title: String, date: String, movieId: Int, posterURL: String?, genres: String, remainingTime: String)] = []
+            let dispatchGroup = DispatchGroup()
+            
+            for (key, dict) in savedReminders {
+                guard let title = dict["title"] as? String,
+                      let startDate = dict["startDate"] as? TimeInterval,
+                      let movieId = Int(key) else { continue }
+
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateStyle = .medium
+                dateFormatter.timeStyle = .short
+                let date = dateFormatter.string(from: Date(timeIntervalSince1970: startDate))
+                
+                let reminderDate = Date(timeIntervalSince1970: startDate)
+                let remainingTime = calculateRemainingTime(from: reminderDate)
+                
+                dispatchGroup.enter()
+                TMDBService().fetchMovieById(movieId: movieId) { result in
+                    var posterURL: String?
+                    var genresString: String = ""
+                    switch result {
+                    case .success(let movie):
+                        posterURL = movie.posterPath != nil ? "https://image.tmdb.org/t/p/w200\(movie.posterPath!)" : nil
+                        genresString = movie.genres?.map { $0.name }.joined(separator: " / ") ?? ""
+                    case .failure(let error):
+                        print("Failed to fetch movie: \(error.localizedDescription)")
+                    }
+                    tempReminders.append((title: title, date: date, movieId: movieId, posterURL: posterURL, genres: genresString, remainingTime: remainingTime))
+                    dispatchGroup.leave()
+                }
+            }
+            
+            dispatchGroup.notify(queue: .main) {
+                self.reminders = tempReminders
+            }
         }
     }
 
-    #Preview {
-        LibraryView()
+    private func calculateRemainingTime(from reminderDate: Date) -> String {
+        let calendar = Calendar.current
+        let currentDate = Date()
+        
+        let components = calendar.dateComponents([.day, .hour], from: currentDate, to: reminderDate)
+        
+        if let days = components.day, days > 0 {
+            return "\(days) Days"
+        } else if let hours = components.hour, hours > 0 {
+            return "\(hours) Hours"
+        } else {
+            return "Due Now"
+        }
     }
+}

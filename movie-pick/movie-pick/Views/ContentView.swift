@@ -1,9 +1,11 @@
 import SwiftUI
-
+import EventKit
+import UserNotifications
 
 struct ContentView: View {
     @State private var selectedTab = 0
-    private let tmdbService = TMDBService() 
+    private let tmdbService = TMDBService()
+    private var eventStore = EKEventStore()
     
     init() {
         let appearance = UITabBarAppearance()
@@ -118,7 +120,44 @@ struct ContentView: View {
         .background(Color.mainColor1)
         .navigationViewStyle(StackNavigationViewStyle())
         .onAppear {
+            fetchPermissions()
             fetchPopularMovies()
+        }
+    }
+    
+    private func fetchPermissions() {
+        requestCalendarAccess()
+        requestReminderAccess()
+        requestNotificationAccess()
+    }
+    
+    private func requestCalendarAccess() {
+        eventStore.requestAccess(to: .event) { granted, error in
+            if granted {
+                print("Calendar access granted.")
+            } else {
+                print("Calendar access denied: \(String(describing: error?.localizedDescription))")
+            }
+        }
+    }
+    
+    private func requestReminderAccess() {
+        eventStore.requestAccess(to: .reminder) { granted, error in
+            if granted {
+                print("Reminder access granted.")
+            } else {
+                print("Reminder access denied: \(String(describing: error?.localizedDescription))")
+            }
+        }
+    }
+    
+    private func requestNotificationAccess() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            if granted {
+                print("Notification access granted.")
+            } else {
+                print("Notification access denied: \(String(describing: error?.localizedDescription))")
+            }
         }
     }
     
