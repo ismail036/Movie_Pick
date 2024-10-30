@@ -30,11 +30,6 @@ struct ShowDetailInfoCard: View {
                             .foregroundColor(.white)
                     }
                     .padding(.vertical, 5)
-                    .overlay(
-                        Divider().background(Color.blue)
-                            .frame(height: 1),
-                        alignment: .bottom
-                    )
                 }
             }
             .padding()

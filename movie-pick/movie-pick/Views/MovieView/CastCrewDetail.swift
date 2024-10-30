@@ -24,14 +24,16 @@ struct CastCrewDetail: View {
                         selectedTab = 0
                     }
                     .padding(.horizontal, 16)
+                    .padding(.vertical,0)
                 
                 TabButton(title: "Crew", isSelected: selectedTab == 1, fontSize: 20)
                     .onTapGesture {
                         selectedTab = 1
                     }
                     .padding(.horizontal, 16)
+                    .padding(.vertical,0)
             }
-            .padding(.top)
+            .padding(.vertical,0)
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {

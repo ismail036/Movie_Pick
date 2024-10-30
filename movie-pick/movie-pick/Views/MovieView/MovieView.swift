@@ -15,7 +15,7 @@ struct MovieView: View {
             
             ScrollView {
                 VStack(alignment: .leading) {
-                    WelcomeSection(text: "TV Shows")
+                    WelcomeSection(text: "Welcome")
                     Spacer().frame(height: 16)
                     
                     TrendingSection()

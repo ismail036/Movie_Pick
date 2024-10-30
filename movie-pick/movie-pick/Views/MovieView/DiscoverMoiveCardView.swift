@@ -44,7 +44,7 @@ struct DiscoverMovieCardView: View {
                 HStack {
                     ForEach(genres, id: \.self) { genre in
                         Text(genre)
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.system(size: 10, weight: .bold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)

@@ -33,33 +33,37 @@ struct BoxOfficeView: View {
                 .padding(.bottom, 5)
             
             ForEach(movies.prefix(5), id: \.id) { movie in
-                HStack {
-                    Text("\(movies.firstIndex(where: { $0.id == movie.id })! + 1)")
-                        .font(.system(size: 28))
-                        .fontWeight(.bold)
-                        .foregroundColor(Color.cyanBlue)
-                    
-                    Rectangle()
-                        .fill(LinearGradient(
-                            gradient: Gradient(colors: [Color("MainColor2Primary"), Color("MainColor2Secondary")]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        ))
-                        .frame(width: 2, height: 16)
-                    
-                    VStack(alignment: .leading) {
-                        Text(movie.title)
-                            .font(.callout)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
+                
+                NavigationLink(destination: MovieDetail(movie: movie)){
+                    HStack {
+                        Text("\(movies.firstIndex(where: { $0.id == movie.id })! + 1)")
+                            .font(.system(size: 28))
+                            .fontWeight(.bold)
+                            .foregroundColor(Color.cyanBlue)
                         
-                        Text("Total Gross: $\(movie.revenue ?? 0)")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                        Rectangle()
+                            .fill(LinearGradient(
+                                gradient: Gradient(colors: [Color("MainColor2Primary"), Color("MainColor2Secondary")]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ))
+                            .frame(width: 2, height: 16)
+                        
+                        VStack(alignment: .leading) {
+                            Text(movie.title)
+                                .font(.callout)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                            
+                            Text("Total Gross: $\(movie.revenue ?? 0)")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                        
+                        Spacer()
                     }
-                    
-                    Spacer()
                 }
+                
             }
         }
         .background(Color.black.edgesIgnoringSafeArea(.all))

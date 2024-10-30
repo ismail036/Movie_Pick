@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct MovieDetail: View {
-    
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedTab = 0
     @State private var isSticky = false
+    @State private var trailerURL: URL?
     let stickyThreshold = UIScreen.main.bounds.height * 0.35
-    let movie: MovieModel 
-
+    let movie: MovieModel
+    private let tmdbService = TMDBService()
+    
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
@@ -59,7 +60,9 @@ struct MovieDetail: View {
 
                         Spacer()
 
-                        Button(action: {}) {
+                        Button(action: {
+                            fetchTrailer()
+                        }) {
                             Image("movie_icon")
                                 .resizable()
                                 .frame(width: 60, height: 60)
@@ -78,9 +81,8 @@ struct MovieDetail: View {
 
             ScrollView {
                 VStack(spacing: 5) {
-                    // Movie Detail Info Section
-                    MovieDetailInfoSection(movie: self.movie) // Movie detayları burada gösteriliyor
-
+                    MovieDetailInfoSection(movie: self.movie)
+                    
                     GeometryReader { geo in
                         let offset = geo.frame(in: .global).minY
                         Color.clear
@@ -100,7 +102,7 @@ struct MovieDetail: View {
                     }
                     
                     if selectedTab == 0 {
-                        OverviewTab(movieID: movie.id,movieModel:self.movie)
+                        OverviewTab(movieID: movie.id, movieModel: self.movie)
                     } else if selectedTab == 1 {
                         PhotosAndVideosTab(movieId: movie.id)
                     } else if selectedTab == 2 {
@@ -144,7 +146,70 @@ struct MovieDetail: View {
         .edgesIgnoringSafeArea(.top)
         .background(Color.mainColor1)
     }
+    
+    private func fetchTrailer() {
+        tmdbService.fetchMovieTrailer(movieId: movie.id) { result in
+            switch result {
+            case .success(let urlString):
+                if let url = URL(string: urlString) {
+                    UIApplication.shared.open(url) // URL'yi doğrudan aç
+                }
+            case .failure(let error):
+                print("Error fetching trailer: \(error.localizedDescription)")
+            }
+        }
+    }
 }
+
+
+extension TMDBService {
+    func fetchMovieTrailer(movieId: Int, completion: @escaping (Result<String, Error>) -> Void) {
+        let endpoint = "\(TMDBAPI.baseURL)/movie/\(movieId)/videos"
+        guard var urlComponents = URLComponents(string: endpoint) else { return }
+
+        urlComponents.queryItems = [
+            URLQueryItem(name: "api_key", value: TMDBAPI.apiKey),
+            URLQueryItem(name: "language", value: "en-US")
+        ]
+        
+        guard let url = urlComponents.url else { return }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+            
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let response = try decoder.decode(VideoResponse.self, from: data)
+                
+                // Optional binding to safely access the first video if it exists
+                if let trailer = response.results?.first(where: { $0.type == "Trailer" && $0.site == "YouTube" }) {
+                    let trailerURL = "https://www.youtube.com/watch?v=\(trailer.key)"
+                    completion(.success(trailerURL))
+                } else {
+                    completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Trailer not found"])))
+                }
+            } catch {
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+}
+
+
+
 // Sticky TabButtons Bileşeni
 struct TabButtonsView: View {
     @Binding var selectedTab: Int

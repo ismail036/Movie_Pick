@@ -22,6 +22,11 @@ struct MovieDetailInfoSection: View {
     @State var showEventEditView = false
     @State var isReminded: Bool = false
     private var eventStore = EKEventStore()
+    @State private var showPopup = false
+    
+    @State var showProviderPopup = false // Yeni popup için state
+
+    private let tmdbService = TMDBService()
     
     init(movie: MovieModel) {
         self.movie = movie
@@ -46,18 +51,23 @@ struct MovieDetailInfoSection: View {
                         .clipShape(Circle())
                     Rectangle()
                         .frame(width: 50, height: 0)
-                    Button(action: {}) {
-                        Image(systemName: "chevron.right")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 10)
-                            .foregroundColor(.gray)
-                    }
+                    Image(systemName: "chevron.right")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 10)
+                        .foregroundColor(.gray)
                 }
                 .padding(10)
-                .background(Color.mainColor3)
+                .background(Color.gray.opacity(0.2)) // Replace with Color.mainColor3 if defined
                 .cornerRadius(40)
                 .padding(.horizontal)
+                .onTapGesture {
+                    showPopup = true
+                }
+            }
+            .sheet(isPresented: $showPopup) {
+                PopupView(movieId: movie.id)
+                    .presentationDetents([.fraction(0.5)])
             }
             
             HStack {
@@ -67,21 +77,7 @@ struct MovieDetailInfoSection: View {
                         .font(.title)
                         .bold()
                         .padding(.bottom, 2)
-                    
-                    HStack {
-                        ForEach(genres.prefix(3), id: \.self) { genre in
-                            Text(genre)
-                                .foregroundStyle(Color.cyan)
-                                .font(.caption)
-                                .bold()
-                            if genre != genres.prefix(3).last {
-                                Text("•")
-                                    .foregroundStyle(Color.cyan)
-                                    .font(.caption)
-                                    .bold()
-                            }
-                        }
-                    }
+
                 }
                 
                 Spacer()
@@ -107,7 +103,7 @@ struct MovieDetailInfoSection: View {
                     .alert(isPresented: $showSettingsAlert) {
                         Alert(
                             title: Text("Permission Needed"),
-                            message: Text("Hatırlatıcıya erişim izni vermeniz gerekiyor. Lütfen Ayarlar'dan izin verin."),
+                            message: Text("You need to grant permission to access the reminder. Please grant permission from Settings."),
                             primaryButton: .default(Text("Ayarlar"), action: {
                                 if let url = URL(string: UIApplication.openSettingsURLString) {
                                     UIApplication.shared.open(url)
@@ -137,6 +133,24 @@ struct MovieDetailInfoSection: View {
                 }
             }
             .padding(.horizontal, 16)
+            
+            HStack(alignment: .center) {
+                ForEach(genres.prefix(3), id: \.self) { genre in
+                    Text(genre)
+                        .foregroundStyle(Color.cyan)
+                        .font(.caption)
+                        .bold()
+                    if genre != genres.prefix(3).last {
+                        Text("•")
+                            .foregroundStyle(Color.cyan)
+                            .font(.caption)
+                            .bold()
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.bottom,5)
 
             GeometryReader { geometry in
                 HStack(spacing: 10) {
@@ -203,7 +217,7 @@ struct MovieDetailInfoSection: View {
                 .padding(.horizontal, 14)
                 .frame(width: geometry.size.width)
             }
-            .frame(height: 40)
+            .frame(height: 33)
             .onAppear {
                 fetchMovieDetails()
                 checkIfBookmarked()
@@ -216,7 +230,16 @@ struct MovieDetailInfoSection: View {
                 saveReminderToUserDefaults(title: title, movieId: movieId, startDate: startDate)
             }
         }
+        .background(Color.black)
+
     }
+    
+    private func toggleBookmark() {
+        isBookmarked.toggle()
+    }
+
+
+
     
     private func requestReminderAccess() {
         eventStore.requestAccess(to: .reminder) { granted, error in
@@ -249,14 +272,7 @@ struct MovieDetailInfoSection: View {
         }
     }
     
-    private func toggleBookmark() {
-        isBookmarked.toggle()
-        if isBookmarked {
-            saveToFavorites()
-        } else {
-            removeFromFavorites()
-        }
-    }
+
     
     private func saveToFavorites() {
         var favoriteMovies = UserDefaults.standard.array(forKey: "favoriteMovieIds") as? [Int] ?? []
@@ -314,6 +330,12 @@ struct MovieDetailInfoSection: View {
     }
 }
 
+
+
+
+
+
+
 struct EventEditView: UIViewControllerRepresentable {
     let eventStore: EKEventStore
     let movie: MovieModel
@@ -356,7 +378,263 @@ struct EventEditView: UIViewControllerRepresentable {
             controller.dismiss(animated: true)
         }
     }
+    
+    
+
 }
+
+
+
+
+
+
+import SwiftUI
+
+
+struct PopupView: View {
+    let movieId: Int
+    @State private var providers: [Provider] = []
+    @State private var selectedCategory: String = "Stream"
+    @Environment(\.presentationMode) var presentationMode
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Spacer()
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.gray.opacity(0.6))
+                    .frame(width: 40, height: 5)
+                Spacer()
+            }
+            .padding(.bottom, 1)
+
+            HStack {
+                Spacer()
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.gray)
+                }
+            }
+            
+            Text("Where to Watch")
+                .font(.headline)
+                .padding(.top, 5)
+                .foregroundStyle(Color.white)
+            
+            HStack(spacing: 10) {
+                categoryButton(title: "Stream", count: providersCount(for: "flatrate"))
+                categoryButton(title: "Rent", count: providersCount(for: "rent"))
+                categoryButton(title: "Buy", count: providersCount(for: "buy"))
+            }
+            .padding(.vertical)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    ForEach(filteredProviders, id: \.id) { provider in
+                        VStack {
+                            AsyncImage(url: URL(string: provider.logoPath)) { image in
+                                image.resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(Circle())
+                            } placeholder: {
+                                ProgressView()
+                            }
+                            VStack(spacing: 0) {
+                                let words = provider.name.split(separator: " ")
+                                if words.count > 2 {
+                                    Text(words.prefix(2).joined(separator: " "))
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+                                    Text(words.dropFirst(2).joined(separator: " "))
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+                                } else {
+                                    Text(provider.name)
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            }
+            
+            HStack {
+                Text("Provided by")
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+                Image("tmdb")
+                
+                Spacer()
+                
+                Text("Powered by")
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+                Image("justWatch")
+            }
+            .padding(.top,20)
+            
+            Spacer()
+        }
+        .padding()
+        .background(Color.mainColor3)
+        .cornerRadius(20)
+        .onAppear {
+            fetchProviders()
+        }
+    }
+    
+    private func categoryButton(title: String, count: Int) -> some View {
+        Button(action: { selectedCategory = title }) {
+            HStack {
+                Text(title)
+                    .foregroundColor(selectedCategory == title ? .black : .gray)
+                    .cornerRadius(15)
+                Text("\(count)")
+                    .foregroundColor(selectedCategory == title ? .black : .gray)
+                    .cornerRadius(15)
+            }
+            .font(.subheadline)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(selectedCategory == title ? Color.white : Color.clear)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.white, lineWidth: 1)
+            )
+            .cornerRadius(12)
+        }
+    }
+
+    private func providersCount(for category: String) -> Int {
+        providers.filter { $0.category == category }.count
+    }
+    
+    private var filteredProviders: [Provider] {
+        providers.filter { provider in
+            switch selectedCategory {
+            case "Stream":
+                return provider.category == "flatrate"
+            case "Rent":
+                return provider.category == "rent"
+            case "Buy":
+                return provider.category == "buy"
+            default:
+                return false
+            }
+        }
+    }
+    
+    private func fetchProviders() {
+        TMDBService().fetchProvidersForMovie(movieId: movieId) { result in
+            switch result {
+            case .success(let providers):
+                DispatchQueue.main.async {
+                    self.providers = providers
+                }
+            case .failure(let error):
+                print("Failed to fetch providers: \(error.localizedDescription)")
+            }
+        }
+    }
+}
+
+
+extension TMDBService {
+    func fetchProvidersForMovie(movieId: Int, completion: @escaping (Result<[Provider], Error>) -> Void) {
+        guard let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieId)/watch/providers") else { return }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(TMDBAPI.apiKey)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Data is nil"])))
+                return
+            }
+            
+            do {
+                let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+                let results = json?["results"] as? [String: Any]
+                
+                var providers: [Provider] = []
+                
+                for (_, value) in results ?? [:] {
+                    if let regionProviders = value as? [String: Any] {
+                        // Stream, Rent, Buy providers ayrımı
+                        if let flatrateProviders = regionProviders["flatrate"] as? [[String: Any]] {
+                            providers.append(contentsOf: flatrateProviders.compactMap { Provider(dictionary: $0, category: "flatrate") })
+                        }
+                        if let rentProviders = regionProviders["rent"] as? [[String: Any]] {
+                            providers.append(contentsOf: rentProviders.compactMap { Provider(dictionary: $0, category: "rent") })
+                        }
+                        if let buyProviders = regionProviders["buy"] as? [[String: Any]] {
+                            providers.append(contentsOf: buyProviders.compactMap { Provider(dictionary: $0, category: "buy") })
+                        }
+                    }
+                }
+
+                // Benzersiz id'lere göre filtreleme
+                let uniqueProviders = Array(
+                    Dictionary(grouping: providers, by: { $0.id })
+                        .compactMapValues { $0.first }
+                        .values
+                )
+                
+                completion(.success(uniqueProviders))
+            } catch {
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+}
+
+
+
+struct Provider: Identifiable, Hashable {
+    let id: Int
+    let name: String
+    let logoPath: String
+    let category: String
+    
+    init?(dictionary: [String: Any], category: String) {
+        guard let id = dictionary["provider_id"] as? Int,
+              let name = dictionary["provider_name"] as? String,
+              let logoPath = dictionary["logo_path"] as? String else {
+            return nil
+        }
+        self.id = id
+        self.name = name
+        self.logoPath = "https://image.tmdb.org/t/p/w500\(logoPath)"
+        self.category = category
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: Provider, rhs: Provider) -> Bool {
+        return lhs.id == rhs.id
+    }
+}
+
+
+
+#Preview {
+    PopupView(movieId: 278)
+}
+
 
 #Preview {
     MovieDetailInfoSection(movie: MovieModel(

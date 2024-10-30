@@ -41,7 +41,7 @@ struct ShowView: View {
                     
                     Spacer().frame(height: 16)
 
-                    WatchlistSection()
+                    ShowWatchList()
                     
                     Spacer().frame(height: 16)
                     

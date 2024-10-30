@@ -49,7 +49,17 @@ struct MovieModel: Codable, Identifiable {
 struct Genre: Codable, Identifiable {
     let id: Int
     let name: String
+    
+    static let allGenres: [String: Int] = [
+        "Action": 28,
+        "Adventure": 12,
+        "Animation": 16,
+        "Comedy": 35,
+        "Horror": 27,
+        "Sci-Fi": 878
+    ]
 }
+
 
 extension MovieModel {
     var weeksInTheater: Int {

@@ -932,7 +932,6 @@ class TMDBService {
     }
 
     
-    
 }
 
 
@@ -1011,9 +1010,31 @@ struct ProviderModel: Codable, Identifiable {
     let id: Int
     let providerName: String
     let logoPath: String?
+    let providerType: ProviderType // Yeni alan
 
     var logoURL: URL? {
         guard let path = logoPath else { return nil }
         return URL(string: "https://image.tmdb.org/t/p/w200\(path)")
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case providerName = "provider_name"
+        case logoPath = "logo_path"
+        case providerType = "type" // JSON yanıtındaki doğru alanı belirtin
+    }
+}
+
+// Sağlayıcı türlerini ayırt etmek için bir enum ekleyelim
+enum ProviderType: String, Codable {
+    case stream = "Stream"
+    case rent = "Rent"
+    case buy = "Buy"
+}
+
+
+extension Array where Element == String {
+    func joinedByComma() -> String {
+        return self.joined(separator: ",")
     }
 }

@@ -1,13 +1,13 @@
 //
-//  WatchlistSection.swift
+//  ShowWatchList.swift
 //  movie-pick
 //
-//  Created by İsmail Parlak on 21.10.2024.
+//  Created by İsmail Parlak on 30.10.2024.
 //
 
 import SwiftUI
 
-struct WatchlistSection: View {
+struct ShowWatchList: View {
     @State private var bookmarkedMovies: [MovieDetailModel] = []
     @State private var bookmarkedShows: [TVShowDetailModel] = []
     
@@ -20,7 +20,6 @@ struct WatchlistSection: View {
                     .foregroundColor(.white)
                 
                 Spacer()
-                
             }
             
             HStack {
@@ -37,12 +36,12 @@ struct WatchlistSection: View {
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
-                        if !bookmarkedMovies.isEmpty {
-                            ForEach(bookmarkedMovies, id: \.id) { movie in
-                                VerticalMovieCard(movieId: movie.id)
+                        
+                        if !bookmarkedShows.isEmpty {
+                            ForEach(bookmarkedShows, id: \.id) { show in
+                                VerticalShowCard(showId: show.id)
                             }
                         }
-                        
                     }
                     .padding(.horizontal)
                 }
@@ -56,11 +55,8 @@ struct WatchlistSection: View {
     
     private var emptyWatchlistView: some View {
         VStack {
-            Image(systemName: "bookmark")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 50, height: 50)
-                .foregroundColor(.gray)
+            Image("showWatchList")
+ 
             
             Text("Watchlist")
                 .font(.title)
@@ -128,8 +124,6 @@ struct WatchlistSection: View {
     }
 }
 
-
-
 #Preview {
-    WatchlistSection()
+    ShowWatchList()
 }
