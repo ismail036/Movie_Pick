@@ -52,7 +52,7 @@
                     .padding(.vertical, 0)
                 }
             }
-            .background(Color.black)
+            .background(Color.mainColor1)
             .navigationBarBackButtonHidden(true)
             .onAppear(perform: loadSimilarMovies) // Görünüm oluşunca benzer filmleri yükler
         }

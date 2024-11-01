@@ -67,6 +67,7 @@ struct ShowDetailInfoSection: View {
                                 .background(Color.mainColor1.edgesIgnoringSafeArea(.all))
                                 .presentationDetents([.fraction(0.5)])
                         }
+                        .background(Color.mainColor1)
             
             // Title and Genre Tags
             HStack {
@@ -147,8 +148,10 @@ struct ShowDetailInfoSection: View {
                     }
                     .padding(.horizontal, 5)
                 }
+                .background(Color.mainColor1)
             }
             .padding(.horizontal, 16)
+            .background(Color.mainColor1)
             
             // Vote, Runtime, Release Date Section
             GeometryReader { geometry in
@@ -229,7 +232,7 @@ struct ShowDetailInfoSection: View {
                 checkIfReminded()
             }
         }
-        .background(Color.black)
+        .background(Color.mainColor1)
         .sheet(isPresented: $showEventEditView) {
             ShowEventEditView(eventStore: eventStore, showId: showId, title: title) { title, showId, startDate in
                 saveReminderToUserDefaults(title: title, showId: showId, startDate: startDate)
@@ -532,7 +535,7 @@ struct ShowPopupView: View {
         }
         .padding()
         .background(Color.mainColor3)
-        .cornerRadius(20)
+        .cornerRadius(10)
         .onAppear {
             fetchProviders()
         }

@@ -67,6 +67,7 @@ struct MovieDetailInfoSection: View {
             }
             .sheet(isPresented: $showPopup) {
                 PopupView(movieId: movie.id)
+                    .background(Color.mainColor1.edgesIgnoringSafeArea(.all))
                     .presentationDetents([.fraction(0.5)])
             }
             
@@ -224,18 +225,22 @@ struct MovieDetailInfoSection: View {
                 checkIfReminded()
             }
         }
-        .background(Color.black)
+        .background(Color.mainColor1)
         .sheet(isPresented: $showEventEditView) {
             EventEditView(eventStore: eventStore, movie: movie) { title, movieId, startDate in
                 saveReminderToUserDefaults(title: title, movieId: movieId, startDate: startDate)
             }
         }
-        .background(Color.black)
 
     }
     
     private func toggleBookmark() {
         isBookmarked.toggle()
+        if isBookmarked {
+            saveToFavorites()
+        } else {
+            removeFromFavorites()
+        }
     }
 
 
@@ -483,7 +488,7 @@ struct PopupView: View {
         }
         .padding()
         .background(Color.mainColor3)
-        .cornerRadius(20)
+        .cornerRadius(10)
         .onAppear {
             fetchProviders()
         }

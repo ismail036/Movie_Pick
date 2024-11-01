@@ -32,7 +32,7 @@ struct WatchlistSection: View {
                 Spacer()
             }
             
-            if bookmarkedMovies.isEmpty && bookmarkedShows.isEmpty {
+            if bookmarkedMovies.isEmpty {
                 emptyWatchlistView
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {

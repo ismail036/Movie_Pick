@@ -45,7 +45,7 @@ struct ShowMoreLikeThisSection: View {
                 .padding(.vertical, 0)
             }
         }
-        .background(Color.black)
+        .background(Color.mainColor1)
         .navigationBarBackButtonHidden(true)
         .onAppear(perform: loadSimilarShows) // Görünüm oluşunca benzer dizileri yükler
     }

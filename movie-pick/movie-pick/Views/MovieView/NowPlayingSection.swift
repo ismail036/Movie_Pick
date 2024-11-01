@@ -35,7 +35,7 @@ struct NowPlayingSection: View {
                 }
             }
         }
-        .background(Color.black)
+        .background(Color.mainColor1)
         .onAppear {
             fetchNowPlayingMovies()
         }

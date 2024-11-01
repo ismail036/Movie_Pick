@@ -78,7 +78,7 @@ struct ShowStreamingProvidersSection: View {
                 }
             }
         }
-        .background(Color.black)
+        .background(Color.mainColor1)
         .onAppear {
             fetchShows()
         }

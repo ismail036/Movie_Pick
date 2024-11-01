@@ -39,7 +39,7 @@ struct AiringTodaySection: View {
                 .padding(.horizontal)
             }
         }
-        .background(Color.black)
+        .background(Color.mainColor1)
         .onAppear {
             fetchAiringTodayShows()
         }

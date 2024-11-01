@@ -35,7 +35,7 @@ struct ShowTopRatedSection: View {
                 }
             }
         }
-        .background(Color.black)
+        .background(Color.mainColor1)
         .onAppear {
             fetchTopRatedShows()
         }

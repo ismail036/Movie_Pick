@@ -13,7 +13,6 @@ func formatCurrencyInMillions(_ value: Double) -> String {
     formatter.currencyCode = "USD"
     formatter.maximumFractionDigits = 0
     
-    // Milyon formatı (1,000,000 = 1M)
     if value >= 1_000_000 {
         let millionValue = value / 1_000_000
         return (formatter.string(from: NSNumber(value: millionValue)) ?? "$0") + "M"
@@ -33,13 +32,15 @@ struct BoxOfficeDetail: View {
             ScrollView {
                 VStack(alignment: .leading) {
                     ForEach(movies, id: \.id) { movie in
-                        BoxOfficeMovieCard(
-                            posterImage: movie.posterURL?.absoluteString ?? "",
-                            movieTitle: movie.title,
-                            totalGross: formatCurrencyInMillions(Double(movie.revenue ?? 0)),
-                            weekendGross: formatCurrencyInMillions(Double(movie.weekendGross ?? 0)), // weekendGross formatlama
-                            week: movie.weeksInTheater ?? 1
-                        )
+                        NavigationLink(destination:MovieDetail(movie: movie)){
+                            BoxOfficeMovieCard(
+                                posterImage: movie.posterURL?.absoluteString ?? "",
+                                movieTitle: movie.title,
+                                totalGross: formatCurrencyInMillions(Double(movie.revenue ?? 0)),
+                                weekendGross: formatCurrencyInMillions(Double(movie.weekendGross ?? 0)), // weekendGross formatlama
+                                week: movie.weeksInTheater ?? 1
+                            )
+                        }
                     }
                 }
             }

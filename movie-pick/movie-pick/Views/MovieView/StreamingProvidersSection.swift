@@ -78,7 +78,7 @@ struct StreamingProvidersSection: View {
                 }
             }
         }
-        .background(Color.black)
+        .background(Color.mainColor1)
         .onAppear {
             fetchMovies()
         }

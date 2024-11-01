@@ -90,7 +90,7 @@ struct VideosSection: View {
                 .padding(.horizontal)
             }
         }
-        .background(Color.black)
+        .background(Color.mainColor1)
         .navigationBarBackButtonHidden(true)
         .sheet(item: $selectedVideo) { video in
             if let url = video.videoURL {

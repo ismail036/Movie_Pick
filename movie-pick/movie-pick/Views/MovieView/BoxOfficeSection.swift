@@ -12,7 +12,7 @@ struct BoxOfficeView: View {
     private let tmdbService = TMDBService()
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("World Box Office")
                     .font(.title)
@@ -27,14 +27,13 @@ struct BoxOfficeView: View {
                 }
             }
             
-            Text("Weekend of Oct 4 - 6, 2024")
+            Text(getPreviousWeekendDateRange())
                 .font(.caption)
-                .foregroundColor(.gray)
-                .padding(.bottom, 5)
-            
+                .foregroundColor(.white)
+                .padding(.bottom, 10)
+
             ForEach(movies.prefix(5), id: \.id) { movie in
-                
-                NavigationLink(destination: MovieDetail(movie: movie)){
+                NavigationLink(destination: MovieDetail(movie: movie)) {
                     HStack {
                         Text("\(movies.firstIndex(where: { $0.id == movie.id })! + 1)")
                             .font(.system(size: 28))
@@ -63,9 +62,9 @@ struct BoxOfficeView: View {
                         Spacer()
                     }
                 }
-                
             }
         }
+        .padding(0 )
         .background(Color.black.edgesIgnoringSafeArea(.all))
         .onAppear {
             tmdbService.fetchWeeklyBoxOfficeWithRevenue { result in
@@ -78,9 +77,41 @@ struct BoxOfficeView: View {
             }
         }
     }
+    
+    func getPreviousWeekendDateRange() -> String {
+        let calendar = Calendar.current
+        let today = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+
+        guard let lastWeek = calendar.date(byAdding: .day, value: -7, to: today) else {
+            print("Couldn't calculate last week's date")
+            return ""
+        }
+
+        var components = calendar.dateComponents([.year, .month, .day, .weekday], from: lastWeek)
+        components.weekday = 6
+        guard let friday = calendar.nextDate(after: lastWeek, matching: components, matchingPolicy: .nextTime, direction: .backward) else {
+            print("Couldn't find Friday for last week")
+            return ""
+        }
+
+        guard let sunday = calendar.date(byAdding: .day, value: 2, to: friday) else {
+            print("Sunday date not found")
+            return ""
+        }
+        
+        let fridayString = formatter.string(from: friday)
+        let sundayString = formatter.string(from: sunday)
+        let year = calendar.component(.year, from: friday)
+        
+        let dateRange = "Weekend of \(fridayString) - \(sundayString), \(year)"
+        print("Date range calculated: \(dateRange)")
+        return dateRange
+    }
+
+
 }
-
-
 
 #Preview {
     BoxOfficeView()

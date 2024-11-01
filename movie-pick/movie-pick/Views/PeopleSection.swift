@@ -22,13 +22,6 @@ struct PeopleSection: View {
                 
                 Spacer()
                 
-                NavigationLink(destination: PopularPeopleDetail()) {
-                    Text("View More")
-                        .foregroundColor(.blue)
-                }
-                .simultaneousGesture(TapGesture().onEnded {
-                    print("NavigationLink to PopularPeopleDetail was tapped")
-                })
             }
             
             ScrollView(.horizontal, showsIndicators: false) {

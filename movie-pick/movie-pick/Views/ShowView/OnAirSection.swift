@@ -35,7 +35,7 @@ struct OnAirSection: View {
                 }
             }
         }
-        .background(Color.black)
+        .background(Color.mainColor1)
         .onAppear {
             fetchOnAirShows()
         }
